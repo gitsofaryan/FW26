@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { MasonryItem } from '../components/MasonryGallery';
+import imageCompression from 'browser-image-compression';
 
 /**
  * Fetch all gallery items from the `memories` table.
@@ -20,7 +21,7 @@ export async function fetchGalleryItems(): Promise<MasonryItem[]> {
     id: String(row.id),
     img: String(row.image_url ?? ''),
     height: Number(row.height ?? 350),
-    title: String(row.title ?? ''),
+    enrollmentNumber: String(row.enrollment_number ?? ''),
   }));
 }
 
@@ -28,13 +29,13 @@ export async function fetchGalleryItems(): Promise<MasonryItem[]> {
  * Insert a new gallery item into the `memories` table.
  */
 export async function addGalleryItem(
-  title: string,
+  enrollmentNumber: string,
   imageUrl: string,
   height: number = 350
 ): Promise<MasonryItem | null> {
   const { data, error } = await supabase
     .from('memories')
-    .insert([{ title, image_url: imageUrl, height }])
+    .insert([{ enrollment_number: enrollmentNumber, image_url: imageUrl, height }])
     .select()
     .single();
 
@@ -47,7 +48,7 @@ export async function addGalleryItem(
     id: String(data.id),
     img: String(data.image_url),
     height: Number(data.height),
-    title: String(data.title),
+    enrollmentNumber: String(data.enrollment_number),
   };
 }
 
@@ -56,13 +57,27 @@ export async function addGalleryItem(
  * Returns the public URL of the uploaded image.
  */
 export async function uploadImage(file: File): Promise<string | null> {
-  const fileExt = file.name.split('.').pop();
+  // Compress image before upload
+  const options = {
+    maxSizeMB: 1, // Compress to max 1MB
+    maxWidthOrHeight: 1920,
+    useWebWorker: true
+  };
+  
+  let compressedFile = file;
+  try {
+    compressedFile = await imageCompression(file, options);
+  } catch (error) {
+    console.warn('Image compression failed, using original file', error);
+  }
+
+  const fileExt = compressedFile.name.split('.').pop() || 'jpg';
   const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
   const filePath = `public/${fileName}`;
 
   const { error } = await supabase.storage
     .from('gallery-images')
-    .upload(filePath, file, {
+    .upload(filePath, compressedFile, {
       cacheControl: '3600',
       upsert: false,
     });

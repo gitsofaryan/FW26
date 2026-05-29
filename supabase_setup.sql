@@ -1,7 +1,6 @@
--- 1. Create the memories table
 CREATE TABLE public.memories (
   id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
-  title text NOT NULL,
+  enrollment_number text NOT NULL,
   image_url text NOT NULL,
   height integer DEFAULT 350,
   created_at timestamp with time zone DEFAULT timezone('utc'::text, now()) NOT NULL

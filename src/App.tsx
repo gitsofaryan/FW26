@@ -8,24 +8,6 @@ import RollingCounter from './components/RollingCounter';
 import PillNav from './components/PillNav';
 import { fetchGalleryItems, addGalleryItem, uploadImage, deleteGalleryItem } from './lib/gallery';
 
-const InstagramIcon = ({ size = 16, className = "" }: { size?: number, className?: string }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    width={size}
-    height={size}
-    viewBox="0 0 24 24"
-    fill="none"
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    className={className}
-  >
-    <rect width="20" height="20" x="2" y="2" rx="5" ry="5" />
-    <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-    <line x1="17.5" x2="17.51" y1="6.5" y2="6.5" />
-  </svg>
-);
 import type { PillNavItem } from './components/PillNav';
 import DeckPlayer from './components/DeckPlayer';
 import { PassCard } from './components/PassCard';
@@ -40,16 +22,16 @@ const NAV_ITEMS: PillNavItem[] = [
 
 /* ─── Gallery Data ─── */
 const INITIAL_GALLERY_ITEMS: MasonryItem[] = [
-  { id: '1', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600', height: 400, title: 'Mountain Lake' },
-  { id: '2', img: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=600', height: 250, title: 'Alpine Meadow' },
-  { id: '3', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=600', height: 600, title: 'Forest Trail' },
-  { id: '4', img: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=600', height: 350, title: 'Coastal Cliffs' },
-  { id: '5', img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=600', height: 500, title: 'Desert Dunes' },
-  { id: '6', img: 'https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=600', height: 300, title: 'Northern Lights' },
-  { id: '7', img: 'https://images.unsplash.com/photo-1426604966848-d7adac402bdb?auto=format&fit=crop&q=80&w=600', height: 450, title: 'Rocky Falls' },
-  { id: '8', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=600', height: 280, title: 'Green Hills' },
-  { id: '9', img: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?auto=format&fit=crop&q=80&w=600', height: 550, title: 'Sunrise Peak' },
-  { id: '10', img: 'https://images.unsplash.com/photo-1493246507139-91e8bef99c02?auto=format&fit=crop&q=80&w=600', height: 320, title: 'Sunset Valley' },
+  { id: '1', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600', height: 400, enrollmentNumber: 'Mountain Lake' },
+  { id: '2', img: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=600', height: 250, enrollmentNumber: 'Alpine Meadow' },
+  { id: '3', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=600', height: 600, enrollmentNumber: 'Forest Trail' },
+  { id: '4', img: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=600', height: 350, enrollmentNumber: 'Coastal Cliffs' },
+  { id: '5', img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=600', height: 500, enrollmentNumber: 'Desert Dunes' },
+  { id: '6', img: 'https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=600', height: 300, enrollmentNumber: 'Northern Lights' },
+  { id: '7', img: 'https://images.unsplash.com/photo-1426604966848-d7adac402bdb?auto=format&fit=crop&q=80&w=600', height: 450, enrollmentNumber: 'Rocky Falls' },
+  { id: '8', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=600', height: 280, enrollmentNumber: 'Green Hills' },
+  { id: '9', img: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?auto=format&fit=crop&q=80&w=600', height: 550, enrollmentNumber: 'Sunrise Peak' },
+  { id: '10', img: 'https://images.unsplash.com/photo-1493246507139-91e8bef99c02?auto=format&fit=crop&q=80&w=600', height: 320, enrollmentNumber: 'Sunset Valley' },
 ];
 
 /* ─── Grid Multiplier ─── */
@@ -73,12 +55,12 @@ export default function App() {
   // Dynamic Gallery Items
   const [galleryItems, setGalleryItems] = useState<MasonryItem[]>(INITIAL_GALLERY_ITEMS);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isProfileHovered, setIsProfileHovered] = useState(false);
   const [galleryLoading, setGalleryLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+
   // Modal form states
-  const [newPostTitle, setNewPostTitle] = useState('');
+  const [newEnrollmentNumber, setNewEnrollmentNumber] = useState('');
   const [newPostImage, setNewPostImage] = useState('');
   const [newPostHeight, setNewPostHeight] = useState(300);
   const [newPostFile, setNewPostFile] = useState<File | null>(null);
@@ -120,7 +102,7 @@ export default function App() {
   // Function to add memory post (with Supabase integration)
   const handleAddPostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newPostTitle || (!newPostImage && !newPostFile)) return;
+    if (!newEnrollmentNumber || (!newPostImage && !newPostFile)) return;
     setIsSubmitting(true);
 
     try {
@@ -139,7 +121,7 @@ export default function App() {
       }
 
       // Try Supabase insert first
-      const newItem = await addGalleryItem(newPostTitle, imageUrl, newPostHeight);
+      const newItem = await addGalleryItem(newEnrollmentNumber, imageUrl, newPostHeight);
       if (newItem) {
         setGalleryItems(prev => [newItem, ...prev]);
       } else {
@@ -148,12 +130,12 @@ export default function App() {
           id: Date.now().toString(),
           img: imageUrl,
           height: newPostHeight,
-          title: newPostTitle,
+          enrollmentNumber: newEnrollmentNumber,
         };
         setGalleryItems(prev => [localItem, ...prev]);
       }
 
-      setNewPostTitle('');
+      setNewEnrollmentNumber('');
       setNewPostImage('');
       setNewPostHeight(300);
       setNewPostFile(null);
@@ -490,13 +472,13 @@ export default function App() {
 
               <form onSubmit={handleAddPostSubmit} className="space-y-4">
                 <div className="space-y-1">
-                  <label className="text-[10px] font-mono uppercase text-white/40">Memory Title</label>
+                  <label className="text-[10px] font-mono uppercase text-white/40">Enrollment Number</label>
                   <input
                     type="text"
                     required
-                    value={newPostTitle}
-                    onChange={(e) => setNewPostTitle(e.target.value)}
-                    placeholder="e.g. Farewell Toast with Batchmates"
+                    value={newEnrollmentNumber}
+                    onChange={(e) => setNewEnrollmentNumber(e.target.value)}
+                    placeholder="e.g. FW26-001"
                     className="w-full px-4 py-2.5 bg-white/5 border border-white/10 focus:border-cyan-500 rounded-xl text-sm text-white placeholder-white/20 focus:outline-none transition-all font-sans"
                     disabled={isSubmitting}
                   />

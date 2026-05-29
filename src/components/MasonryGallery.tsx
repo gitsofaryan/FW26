@@ -68,7 +68,7 @@ export interface MasonryItem {
   img: string;
   url?: string;
   height: number;
-  title?: string;
+  enrollmentNumber?: string;
 }
 
 interface GridItem extends MasonryItem {
@@ -254,9 +254,9 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
               <div className="color-overlay absolute inset-0 bg-gradient-to-tr from-cyan-500/40 to-purple-500/40 opacity-0 pointer-events-none transition-opacity" />
             )}
           </div>
-          {item.title && (
+          {item.enrollmentNumber && (
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
-              <p className="text-white text-xs font-medium uppercase tracking-wider">{item.title}</p>
+              <p className="text-white text-xs font-medium uppercase tracking-wider">{item.enrollmentNumber}</p>
             </div>
           )}
           {onDelete && (
