@@ -31,7 +31,7 @@ const SONGS: Song[] = [
     id: '3',
     title: "Hum Pyaar Karne Wale",
     artist: "Udit Narayan, Anuradha Paudwal & Qveen Herby",
-    cover: "https://images.unsplash.com/photo-1487180142328-054b783fc471?q=80&w=1000&auto=format&fit=crop",
+    cover: "/hum_pyaar_cover.jpg",
     duration: "03:40:00",
     bgGradient: "#ccfbf1", // Light Teal
     headerText: "BOLLYWOOD REVENGE",
@@ -163,7 +163,7 @@ const swipeVariants = {
 };
 
 export default function DeckPlayer() {
-  const [currentIndex, setCurrentIndex] = useState(4);
+  const [currentIndex, setCurrentIndex] = useState(2);
   const [direction, setDirection] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
