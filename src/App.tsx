@@ -2,7 +2,7 @@ import React, { useState, useEffect, Suspense, lazy } from 'react';
 import type { MasonryItem } from './components/MasonryGallery';
 import { Plus, Send, X, Music, Loader2, Upload, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import RollingCounter from './components/RollingCounter';
+
 import PillNav from './components/PillNav';
 import { fetchGalleryItems, addGalleryItem, deleteGalleryItem } from './lib/gallery';
 
