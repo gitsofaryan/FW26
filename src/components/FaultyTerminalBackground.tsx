@@ -22,6 +22,7 @@ export interface FaultyTerminalProps extends React.HTMLAttributes<HTMLDivElement
   dpr?: number;
   pageLoadAnimation?: boolean;
   brightness?: number;
+  lowPower?: boolean;
 }
 
 const vertexShader = `
@@ -56,6 +57,7 @@ uniform float uUseMouse;
 uniform float uPageLoadProgress;
 uniform float uUsePageLoadAnimation;
 uniform float uBrightness;
+uniform float uLowPower;
 
 float time;
 
@@ -79,6 +81,9 @@ mat2 rotate(float angle)
 
 float fbm(vec2 p)
 {
+  if (uLowPower > 0.5) {
+    return 0.5 * uNoiseAmp * noise(p * 1.1);
+  }
   p *= 1.1;
   float f = 0.0;
   float amp = 0.5 * uNoiseAmp;
@@ -180,6 +185,13 @@ vec3 getColor(vec2 p){
     }
     float middle = digit(p);
     
+    if (uLowPower > 0.5) {
+      // Fast, low-power blur on mobile (only 3 samples instead of 9!)
+      float sum = digit(p + vec2(-0.002, 0.0)) + digit(p + vec2(0.0, 0.0)) + digit(p + vec2(0.002, 0.0));
+      vec3 baseColor = vec3(0.9) * middle + sum * 0.3 * vec3(1.0) * bar;
+      return baseColor;
+    }
+    
     const float off = 0.002;
     float sum = digit(p + vec2(-off, -off)) + digit(p + vec2(0.0, -off)) + digit(p + vec2(off, -off)) +
                 digit(p + vec2(-off, 0.0)) + digit(p + vec2(0.0, 0.0)) + digit(p + vec2(off, 0.0)) +
@@ -250,6 +262,7 @@ export const FaultyTerminalBackground = React.memo(function FaultyTerminalBackgr
   dpr = Math.min(typeof window !== 'undefined' ? window.devicePixelRatio : 1, 2),
   pageLoadAnimation = true,
   brightness = 1,
+  lowPower = false,
   className,
   style,
   ...rest
@@ -313,7 +326,8 @@ export const FaultyTerminalBackground = React.memo(function FaultyTerminalBackgr
         uUseMouse: { value: mouseReact ? 1 : 0 },
         uPageLoadProgress: { value: pageLoadAnimation ? 0 : 1 },
         uUsePageLoadAnimation: { value: pageLoadAnimation ? 1 : 0 },
-        uBrightness: { value: brightness }
+        uBrightness: { value: brightness },
+        uLowPower: { value: lowPower ? 1 : 0 }
       }
     });
 
@@ -402,6 +416,7 @@ export const FaultyTerminalBackground = React.memo(function FaultyTerminalBackgr
     mouseStrength,
     pageLoadAnimation,
     brightness,
+    lowPower,
     handleMouseMove
   ]);
 

@@ -38,6 +38,7 @@ export interface HyperspeedOptions {
     rightCars: number[];
     sticks: number;
   };
+  maxLines?: number;
 }
 
 export interface HyperspeedProps {
@@ -80,7 +81,8 @@ const DEFAULT_OPTIONS: HyperspeedOptions = {
     leftCars: [0xD856BF, 0x6750A2, 0xC247AC],
     rightCars: [0x03B3C3, 0x0E5EA5, 0x324555],
     sticks: 0x03B3C3,
-  }
+  },
+  maxLines: 2000
 };
 
 export const Hyperspeed = React.memo(forwardRef<HTMLDivElement, HyperspeedProps>(({ effectOptions, className }, ref) => {
@@ -107,7 +109,7 @@ export const Hyperspeed = React.memo(forwardRef<HTMLDivElement, HyperspeedProps>
       antialias: true,
       alpha: true 
     });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(options.maxLines && options.maxLines < 1000 ? Math.min(window.devicePixelRatio, 1.2) : Math.min(window.devicePixelRatio, 2));
     
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(colors.background);
@@ -127,7 +129,7 @@ export const Hyperspeed = React.memo(forwardRef<HTMLDivElement, HyperspeedProps>
     window.addEventListener('resize', resize);
     resize();
     
-    const count = 2000;
+    const count = options.maxLines || 2000;
     const geometry = new THREE.BufferGeometry();
     const positions = new Float32Array(count * 3 * 2);
     const lineColors = new Float32Array(count * 3 * 2);

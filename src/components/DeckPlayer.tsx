@@ -14,7 +14,7 @@ const SONGS: Song[] = [
     bgGradient: "#ccfbf1", // Light Teal
     headerText: "BOLLYWOOD REVENGE",
     subText: "The iconic melody remixed with modern synth beats",
-    youtubeId: "Th2Op6uvNXw"
+    youtubeId: "OVHkruv-dg8"
   },
   {
     id: '1',
@@ -299,11 +299,10 @@ export default function DeckPlayer() {
     }
   }, [currentIndex, isPlaying, apiReady]);
 
-  // Autoplay recovery listener: attempt to play on first user interaction if blocked
+  // Autoplay recovery listener: registers immediately on mount to capture the first user interaction
   useEffect(() => {
-    if (!apiReady || !isPlaying || !playerRef.current) return;
-
     const resumeAudio = () => {
+      (window as any).__hasInteracted = true;
       try {
         if (playerRef.current && typeof playerRef.current.getPlayerState === 'function') {
           const state = playerRef.current.getPlayerState();
@@ -391,6 +390,7 @@ export default function DeckPlayer() {
           opacity: 0.6 
         }}
         transition={{ duration: 0.4 }}
+        style={{ willChange: 'transform, opacity' }}
       >
          <DeckCard 
             song={nextNextSong} 
@@ -415,6 +415,7 @@ export default function DeckPlayer() {
           opacity: 0.8 
         }}
         transition={{ duration: 0.4 }}
+        style={{ willChange: 'transform, opacity' }}
       >
          <DeckCard 
             song={nextSong} 
@@ -440,6 +441,7 @@ export default function DeckPlayer() {
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
           dragElastic={0.7}
+          style={{ willChange: 'transform, opacity' }}
           onDragEnd={(_, { offset }) => {
             const swipe = offset.x;
             if (swipe < -80) {

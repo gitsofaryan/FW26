@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useCallback, useTransition } from 'react';
 import type { MasonryItem } from './components/MasonryGallery';
 import { Plus, Send, X, Music, Loader2, Upload, Play, Pause, Settings2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -32,6 +32,7 @@ const GRID_MUL: [number, number] = [2, 1];
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<'main' | 'gallery' | 'pass'>('main');
+  const [, startTransition] = useTransition();
   const [presetKey, setPresetKey] = useState<keyof typeof hyperspeedPresets>('one');
   const [terminalKey] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -234,7 +235,9 @@ export default function App() {
           items={NAV_ITEMS}
           activeTab={activeTab}
           onTabChange={(tab) => {
-            setActiveTab(tab);
+            startTransition(() => {
+              setActiveTab(tab);
+            });
             if (tab === 'gallery') {
               setGalleryKey(k => k + 1);
             }
@@ -287,6 +290,7 @@ export default function App() {
                   pageLoadAnimation={true}
                   brightness={terminalConfig.brightness}
                   dpr={isMobile ? 0.7 : 1.5}
+                  lowPower={isMobile}
                   className="absolute inset-0 w-full h-full z-0"
                 />
               </Suspense>
@@ -443,7 +447,10 @@ export default function App() {
             <div className="fixed inset-0 z-0 pointer-events-none">
               <Suspense fallback={<div className="absolute inset-0 bg-black" />}>
                 <Hyperspeed
-                  effectOptions={hyperspeedPresets[presetKey]}
+                  effectOptions={{
+                    ...hyperspeedPresets[presetKey],
+                    maxLines: isMobile ? 600 : 2000
+                  }}
                   className="w-full h-full"
                 />
               </Suspense>
