@@ -267,7 +267,7 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
                   onDelete(item.id);
                 }
               }}
-              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-red-500/80 border border-white/10 text-white/60 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 z-30 cursor-pointer shadow-md"
+              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-red-500/80 border border-white/10 text-white/60 hover:text-white transition-all duration-300 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 z-30 cursor-pointer shadow-md"
               title="Delete memory"
             >
               <Trash2 size={14} />

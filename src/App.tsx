@@ -1,6 +1,6 @@
-import React, { useState, useEffect, Suspense, lazy } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
 import type { MasonryItem } from './components/MasonryGallery';
-import { Plus, Send, X, Music, Loader2, Upload, Play, Pause, Settings2 } from 'lucide-react';
+import { Plus, Send, X, Music, Loader2, Upload, Play, Pause, Settings2, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import PillNav from './components/PillNav';
@@ -129,18 +129,19 @@ export default function App() {
   const [newPostHeight, setNewPostHeight] = useState(300);
   const [newPostFile, setNewPostFile] = useState<File | null>(null);
 
-  // Load gallery from Supabase on mount
-  useEffect(() => {
-    const loadGallery = async () => {
-      setGalleryLoading(true);
-      const items = await fetchGalleryItems();
-      if (items.length > 0) {
-        setGalleryItems(items);
-      }
-      setGalleryLoading(false);
-    };
-    loadGallery();
+  // Load gallery from Supabase
+  const loadGallery = useCallback(async () => {
+    setGalleryLoading(true);
+    const items = await fetchGalleryItems();
+    if (items.length > 0) {
+      setGalleryItems(items);
+    }
+    setGalleryLoading(false);
   }, []);
+
+  useEffect(() => {
+    loadGallery();
+  }, [loadGallery]);
 
   // Function to add memory post (with Supabase integration)
   const handleAddPostSubmit = async (e: React.FormEvent) => {
@@ -392,6 +393,18 @@ export default function App() {
                 </Suspense>
               )}
             </div>
+
+            {/* Floating Refresh Action Button */}
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              whileHover={{ scale: 1.1 }}
+              onClick={loadGallery}
+              className="fixed bottom-[140px] right-4 sm:bottom-[106px] sm:right-10 w-10 h-10 sm:w-12 sm:h-12 bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/20 text-white rounded-full flex items-center justify-center shadow-xl z-40 cursor-pointer"
+              title="Refresh Gallery"
+            >
+              <RefreshCw size={20} className={galleryLoading ? "animate-spin" : ""} />
+            </motion.button>
 
             {/* Floating Plus Action Button */}
             <motion.button
