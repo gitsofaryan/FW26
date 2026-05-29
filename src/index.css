@@ -5,11 +5,22 @@
 @layer base {
   * {
     -webkit-tap-highlight-color: transparent;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
     scrollbar-width: thin;
     scrollbar-color: rgba(255, 255, 255, 0.12) rgba(10, 10, 10, 0.95);
   }
+  
+  /* Allow text selection in inputs and textareas */
+  input, textarea {
+    -webkit-user-select: auto;
+    user-select: auto;
+  }
+
   body {
     @apply bg-black text-white font-sans antialiased overflow-x-hidden;
+    overscroll-behavior-y: none;
   }
 }
 

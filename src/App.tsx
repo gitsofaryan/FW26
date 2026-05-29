@@ -150,10 +150,11 @@ export default function App() {
 
     try {
       // Compress image before upload
+      const isLowMemMobile = window.innerWidth < 640;
       const options = {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1024,
-        useWebWorker: true
+        maxSizeMB: isLowMemMobile ? 0.5 : 1,
+        maxWidthOrHeight: isLowMemMobile ? 800 : 1024,
+        useWebWorker: !isLowMemMobile
       };
       const compressedFile = await imageCompression(newPostFile, options);
 
@@ -275,7 +276,7 @@ export default function App() {
                   mouseStrength={isMobile ? 1.2 : 0.5}
                   pageLoadAnimation={true}
                   brightness={terminalConfig.brightness}
-                  dpr={isMobile ? 1.0 : 1.5}
+                  dpr={isMobile ? 0.7 : 1.5}
                   className="absolute inset-0 w-full h-full z-0"
                 />
               </Suspense>
