@@ -39,7 +39,7 @@ export default function CountdownBucket({ targetDate, isMobile }: CountdownBucke
       }}
     >
       <div
-        className="w-full h-full bg-zinc-950 flex items-center justify-center px-4 sm:px-10 py-1.5 sm:py-2"
+        className="w-full h-full bg-zinc-950 flex items-center justify-center px-6 sm:px-10 py-1.5 sm:py-2"
         style={{
           clipPath: 'polygon(0 0, 100% 0, 92% 100%, 8% 100%)'
         }}
@@ -53,7 +53,7 @@ export default function CountdownBucket({ targetDate, isMobile }: CountdownBucke
             <RollingCounter
               value={days}
               places={[10, 1]}
-              fontSize={isMobile ? 20 : 26}
+              fontSize={isMobile ? 14 : 26}
               textColor="#ffffff"
               fontWeight={700}
               gradientFrom="#09090b"
@@ -74,7 +74,7 @@ export default function CountdownBucket({ targetDate, isMobile }: CountdownBucke
             <RollingCounter
               value={hours}
               places={[10, 1]}
-              fontSize={isMobile ? 20 : 26}
+              fontSize={isMobile ? 14 : 26}
               textColor="#ffffff"
               fontWeight={700}
               gradientFrom="#09090b"
@@ -95,7 +95,7 @@ export default function CountdownBucket({ targetDate, isMobile }: CountdownBucke
             <RollingCounter
               value={minutes}
               places={[10, 1]}
-              fontSize={isMobile ? 20 : 26}
+              fontSize={isMobile ? 14 : 26}
               textColor="#ffffff"
               fontWeight={700}
               gradientFrom="#09090b"
@@ -116,7 +116,7 @@ export default function CountdownBucket({ targetDate, isMobile }: CountdownBucke
             <RollingCounter
               value={seconds}
               places={[10, 1]}
-              fontSize={isMobile ? 20 : 26}
+              fontSize={isMobile ? 14 : 26}
               textColor="#ffffff"
               fontWeight={700}
               gradientFrom="#09090b"

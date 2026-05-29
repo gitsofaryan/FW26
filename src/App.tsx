@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react';
-import FaultyTerminalBackground from './components/FaultyTerminalBackground';
-import MasonryGallery from './components/MasonryGallery';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import type { MasonryItem } from './components/MasonryGallery';
 import { Plus, Send, X, Music, Loader2, Upload, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -9,11 +7,16 @@ import PillNav from './components/PillNav';
 import { fetchGalleryItems, addGalleryItem, deleteGalleryItem } from './lib/gallery';
 
 import type { PillNavItem } from './components/PillNav';
-import DeckPlayer from './components/DeckPlayer';
-import { PassCard } from './components/PassCard';
-import { Hyperspeed, hyperspeedPresets } from './components/Hyperspeed';
+import { hyperspeedPresets } from './components/Hyperspeed';
 import CountdownBucket from './components/CountdownBucket';
 import imageCompression from 'browser-image-compression';
+
+// Lazy load heavy components
+const FaultyTerminalBackground = lazy(() => import('./components/FaultyTerminalBackground'));
+const MasonryGallery = lazy(() => import('./components/MasonryGallery'));
+const DeckPlayer = lazy(() => import('./components/DeckPlayer'));
+const PassCard = lazy(() => import('./components/PassCard').then(module => ({ default: module.PassCard })));
+const Hyperspeed = lazy(() => import('./components/Hyperspeed').then(module => ({ default: module.Hyperspeed })));
 
 /* ─── Navigation Data ─── */
 const NAV_ITEMS: PillNavItem[] = [
@@ -218,28 +221,30 @@ export default function App() {
           >
             {/* ───── Section 1: FaultyTerminal Landing ───── */}
             <section className="relative w-full h-full flex items-center justify-center overflow-hidden">
-              <FaultyTerminalBackground
-                key={terminalKey}
-                scale={1.5}
-                gridMul={GRID_MUL}
-                digitSize={1.2}
-                timeScale={1}
-                pause={isPaused}
-                scanlineIntensity={isMobile ? 0.3 : 1.0}
-                glitchAmount={isMobile ? 1.0 : 1.2}
-                flickerAmount={isMobile ? 0.5 : 1.0}
-                noiseAmp={isMobile ? 0.4 : 1.0}
-                chromaticAberration={isMobile ? 0.0 : 2.0}
-                dither={isMobile ? 0.0 : 0.1}
-                curvature={isMobile ? 0.0 : 0.1}
-                tint="#ffffff"
-                mouseReact={!isMobile}
-                mouseStrength={0.5}
-                pageLoadAnimation={true}
-                brightness={1.0}
-                dpr={isMobile ? 1.0 : 1.5}
-                className="absolute inset-0 w-full h-full z-0"
-              />
+              <Suspense fallback={<div className="absolute inset-0 bg-black flex items-center justify-center"><Loader2 className="animate-spin text-cyan-500 opacity-50" /></div>}>
+                <FaultyTerminalBackground
+                  key={terminalKey}
+                  scale={1.5}
+                  gridMul={GRID_MUL}
+                  digitSize={1.2}
+                  timeScale={1}
+                  pause={isPaused}
+                  scanlineIntensity={isMobile ? 0.3 : 1.0}
+                  glitchAmount={isMobile ? 1.0 : 1.2}
+                  flickerAmount={isMobile ? 0.5 : 1.0}
+                  noiseAmp={isMobile ? 0.4 : 1.0}
+                  chromaticAberration={isMobile ? 0.0 : 2.0}
+                  dither={isMobile ? 0.0 : 0.1}
+                  curvature={isMobile ? 0.0 : 0.1}
+                  tint="#ffffff"
+                  mouseReact={!isMobile}
+                  mouseStrength={0.5}
+                  pageLoadAnimation={true}
+                  brightness={1.0}
+                  dpr={isMobile ? 1.0 : 1.5}
+                  className="absolute inset-0 w-full h-full z-0"
+                />
+              </Suspense>
 
 
 
@@ -268,17 +273,19 @@ export default function App() {
                   </span>
                 </div>
               ) : (
-                <MasonryGallery
-                  key={galleryKey}
-                  items={galleryItems}
-                  animateFrom="bottom"
-                  blurToFocus={true}
-                  stagger={0.08}
-                  scaleOnHover={true}
-                  hoverScale={0.96}
-                  colorShiftOnHover={true}
-                  onDelete={handleDeletePost}
-                />
+                <Suspense fallback={<div className="flex items-center justify-center h-40"><Loader2 className="animate-spin text-cyan-500 opacity-50" /></div>}>
+                  <MasonryGallery
+                    key={galleryKey}
+                    items={galleryItems}
+                    animateFrom="bottom"
+                    blurToFocus={true}
+                    stagger={0.08}
+                    scaleOnHover={true}
+                    hoverScale={0.96}
+                    colorShiftOnHover={true}
+                    onDelete={handleDeletePost}
+                  />
+                </Suspense>
               )}
             </div>
 
@@ -307,10 +314,12 @@ export default function App() {
           >
             {/* Hyperspeed Background - fixed to cover entire viewport behind content */}
             <div className="fixed inset-0 z-0 pointer-events-none">
-              <Hyperspeed
-                effectOptions={hyperspeedPresets[presetKey]}
-                className="w-full h-full"
-              />
+              <Suspense fallback={<div className="absolute inset-0 bg-black" />}>
+                <Hyperspeed
+                  effectOptions={hyperspeedPresets[presetKey]}
+                  className="w-full h-full"
+                />
+              </Suspense>
             </div>
 
             {/* Corner Details Decorator */}
@@ -351,10 +360,12 @@ export default function App() {
               className="relative z-10 w-full min-h-screen sm:h-screen flex items-center justify-center sm:overflow-hidden pt-16 pb-20 sm:pt-12 sm:pb-16 px-2 sm:px-0 cursor-pointer"
             >
               <div onClick={(e) => e.stopPropagation()} className="cursor-default">
-                <PassCard
-                  formUrl="https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform"
-                  className="bg-transparent border-none"
-                />
+                <Suspense fallback={<div className="w-[300px] h-[400px] bg-zinc-900/50 animate-pulse rounded-2xl" />}>
+                  <PassCard
+                    formUrl="https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform"
+                    className="bg-transparent border-none"
+                  />
+                </Suspense>
               </div>
             </div>
           </motion.div>
@@ -475,7 +486,9 @@ export default function App() {
           }}
         >
           <div className="filter drop-shadow-2xl deck-player-container">
-            <DeckPlayer />
+            <Suspense fallback={<div className="w-[320px] h-[400px] bg-zinc-950/80 backdrop-blur-xl animate-pulse rounded-[32px] border border-white/10" />}>
+              <DeckPlayer />
+            </Suspense>
           </div>
         </div>
       </div>
