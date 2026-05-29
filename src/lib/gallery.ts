@@ -1,6 +1,5 @@
 import { supabase } from './supabase';
 import type { MasonryItem } from '../components/MasonryGallery';
-import imageCompression from 'browser-image-compression';
 
 /**
  * Fetch all gallery items from the `memories` table.
@@ -46,6 +45,7 @@ export async function uploadImageWithId(id: string, file: File): Promise<string 
   
   let compressedFile = file;
   try {
+    const imageCompression = (await import('browser-image-compression')).default;
     compressedFile = await imageCompression(file, options);
   } catch (error) {
     console.warn('Image compression failed, using original file', error);

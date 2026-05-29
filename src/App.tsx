@@ -7,9 +7,8 @@ import PillNav from './components/PillNav';
 import { fetchGalleryItems, addGalleryItem, deleteGalleryItem } from './lib/gallery';
 
 import type { PillNavItem } from './components/PillNav';
-import { hyperspeedPresets } from './components/Hyperspeed';
+import { hyperspeedPresets } from './lib/hyperspeedPresets';
 import CountdownBucket from './components/CountdownBucket';
-import imageCompression from 'browser-image-compression';
 
 // Lazy load heavy components
 const FaultyTerminalBackground = lazy(() => import('./components/FaultyTerminalBackground'));
@@ -166,6 +165,7 @@ export default function App() {
         maxWidthOrHeight: isLowMemMobile ? 800 : 1024,
         useWebWorker: !isLowMemMobile
       };
+      const imageCompression = (await import('browser-image-compression')).default;
       const compressedFile = await imageCompression(newPostFile, options);
 
       // Try Supabase insert and upload first
@@ -300,6 +300,7 @@ export default function App() {
               <AnimatePresence>
                 {showTerminalControls && (
                   <motion.div 
+                    key="terminal-controls-panel"
                     initial={{ opacity: 0, scale: 0.9, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -501,11 +502,16 @@ export default function App() {
       {/* ═══════════ ADD MEMORY MODAL ═══════════ */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div
+          <motion.div
+            key="add-modal-backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setIsAddModalOpen(false)}
             className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50 cursor-pointer"
           >
             <motion.div
+              key="add-modal-content"
               onClick={(e) => e.stopPropagation()}
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -597,7 +603,7 @@ export default function App() {
                 </button>
               </form>
             </motion.div>
-          </div>
+          </motion.div>
         )}
       </AnimatePresence>
 

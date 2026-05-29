@@ -191,6 +191,8 @@ export default function DeckPlayer() {
     setIsPlaying((prev) => !prev);
   };
 
+  const youtubeContainerRef = useRef<HTMLDivElement>(null);
+
   // Initialize YT API once on mount
   useEffect(() => {
     // Preload all song covers for instantaneous swiping
@@ -201,9 +203,12 @@ export default function DeckPlayer() {
 
     const initPlayer = () => {
       const YT = (window as any).YT;
-      if (!YT || !YT.Player || playerRef.current) return;
+      if (!YT || !YT.Player || playerRef.current || !youtubeContainerRef.current) return;
 
-      playerRef.current = new YT.Player('youtube-audio-player', {
+      const playerDiv = document.createElement('div');
+      youtubeContainerRef.current.appendChild(playerDiv);
+
+      playerRef.current = new YT.Player(playerDiv, {
         height: '0',
         width: '0',
         videoId: SONGS[currentIndex].youtubeId,
@@ -246,11 +251,18 @@ export default function DeckPlayer() {
         firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
       }
     }
+    
+    return () => {
+      if (playerRef.current) {
+        playerRef.current.destroy();
+        playerRef.current = null;
+      }
+    };
   }, []);
 
   // Synchronize state changes with the player
   useEffect(() => {
-    if (!playerRef.current || typeof playerRef.current.loadVideoById !== 'function') return;
+    if (!apiReady || !playerRef.current || typeof playerRef.current.loadVideoById !== 'function') return;
 
     try {
       const currentVideoId = playerRef.current.getVideoData?.()?.video_id;
@@ -370,7 +382,7 @@ export default function DeckPlayer() {
       </motion.div>
 
       {/* Active Card */}
-      <AnimatePresence custom={direction} mode="popLayout">
+      <AnimatePresence custom={direction}>
         <motion.div
           key={activeSong.id}
           custom={direction}
@@ -403,7 +415,7 @@ export default function DeckPlayer() {
       </AnimatePresence>
 
       {/* Hidden YouTube Player Target Div */}
-      <div id="youtube-audio-player" className="absolute w-0 h-0 opacity-0 pointer-events-none" />
+      <div ref={youtubeContainerRef} className="absolute w-0 h-0 opacity-0 pointer-events-none" />
     </div>
   );
 }
