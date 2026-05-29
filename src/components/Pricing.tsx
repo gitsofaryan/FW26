@@ -29,8 +29,8 @@ const defaultFeatures: PricingFeature[] = [
 export function PricingSection({
   className,
   heading = "Farewell 2026 Passes",
-  subheading = "Secure your spot at the event. Transparent pricing, no hidden fees.",
-  price = "₹1000",
+  subheading = "Finalized Venue: Shawn Elizy 🎩. Minimum 100 participants required. Purchase your pass before 1 June.",
+  price = "₹1050",
   feeLabel = "Standard Entry Pass",
   features = defaultFeatures,
 }: PricingSectionProps) {

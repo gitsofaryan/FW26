@@ -485,7 +485,7 @@ export default function App() {
               onClick={() => setActiveTab('main')}
               className="relative z-10 w-full min-h-screen sm:h-screen flex items-center justify-center sm:overflow-hidden pt-16 pb-20 sm:pt-12 sm:pb-16 px-2 sm:px-0 cursor-pointer"
             >
-              <div onClick={(e) => e.stopPropagation()} className="cursor-default">
+              <div onClick={(e) => e.stopPropagation()} className="cursor-default w-full max-w-[95vw] sm:max-w-[1150px] flex justify-center">
                 <Suspense fallback={<div className="w-[300px] h-[400px] bg-zinc-900/50 animate-pulse rounded-2xl" />}>
                   <PassCard
                     formUrl="https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform"

@@ -1,4 +1,4 @@
-import { Check, ExternalLink, AlertCircle } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { cn } from '../utils';
 
 interface PassCardProps {
@@ -7,29 +7,21 @@ interface PassCardProps {
 }
 
 const features = [
-  { label: '🍽️ Food', included: true },
-  { label: '🎧 DJ & Music', included: true },
-  { label: '🎀 Decorations', included: true },
-  { label: '📸 Photography', included: true },
-  { label: '🎁 Gifts', included: true },
-  { label: '🎯 Games & Activities', included: true },
-  { label: '🛡️ Security & Arrangements', included: true },
+  { label: '🍽️ Food & Venue', cost: '₹800' },
+  { label: '🎧 DJ & Dance Floor', cost: '₹80' },
+  { label: '📸 Photography', cost: '₹50' },
+  { label: '🎊 Decoration', cost: '₹30' },
+  { label: '🛡️ Security Arrangements', cost: '₹20' },
+  { label: '🎁 Gifts & Fun Activities', cost: '₹20' },
+  { label: '😂 Unlimited Bakchodi & Vibes', cost: 'Priceless' }
 ];
 
 export function PassCard({
   className,
   formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform",
 }: PassCardProps) {
-  const laserStyle = `
-    @keyframes laserSweep {
-      0%, 100% { top: 0%; opacity: 0.15; }
-      50% { top: 100%; opacity: 0.8; }
-    }
-  `;
-
   return (
     <div className={cn("w-full font-mono relative z-20 py-2 sm:py-4 bg-transparent flex items-center justify-center border-none", className)}>
-      <style dangerouslySetInnerHTML={{ __html: laserStyle }} />
 
       {/* Dotted background pattern spanning edge-to-edge */}
       <div
@@ -50,55 +42,87 @@ export function PassCard({
       {/* Subtle gradient overlay */}
       <div className="absolute inset-0 z-[2] bg-gradient-to-br from-cyan-500/[0.03] via-transparent to-purple-500/[0.02]" />
 
-      {/* Content Container (Centered & bounded wide content inside the section) */}
-      <div className="relative z-10 w-full max-w-[95vw] sm:max-w-4xl mx-auto px-3 sm:px-6 md:px-12 flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-stretch">
+      {/* Content Container */}
+      <div className="relative z-10 w-full max-w-[95vw] sm:max-w-[1150px] mx-auto px-3 sm:px-6 md:px-8 flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-stretch">
 
         {/* ═══ LEFT SIDE — Pricing & Pass Details ═══ */}
-        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.06]">
+        <div className="flex-1 p-3 sm:p-4 md:p-4 lg:p-5 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.06] space-y-2">
 
           {/* Header */}
-          <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-5">
-            <div className="space-y-1">
-              <span className="text-[10px] uppercase tracking-[0.25em] text-white/60 font-black block">
-                Farewell 2026
+          <div className="space-y-0.5">
+            <span className="text-[10px] uppercase tracking-[0.15em] text-cyan-400 font-black block">
+              विदाई समारोह • FAREWELL 2026
+            </span>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight leading-none">
+              Event<br />Pass
+            </h2>
+          </div>
+
+          {/* Venue & Booking Notice Bulletin */}
+          <div className="p-2 sm:p-2.5 bg-cyan-950/20 border border-cyan-500/25 rounded-2xl space-y-1.5">
+            <div className="flex items-center justify-between">
+              <span className="text-cyan-400 text-[9px] uppercase tracking-widest font-black block">
+                📍 Finalized Venue
               </span>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight leading-[1.1]">
-                Event<br />Pass
-              </h2>
+              <span className="text-rose-400 text-[9px] font-black tracking-widest block uppercase">
+                ⏰ Deadline: 5 June
+              </span>
             </div>
-            <p className="text-white text-xs font-extrabold font-sans leading-relaxed max-w-sm">
-              Secure your spot at the event. Transparent pricing, no hidden fees.
-            </p>
+
+            {/* Venue Image Card */}
+            <div className="relative w-full h-20 sm:h-24 rounded-xl overflow-hidden border border-white/10 group/venue">
+              <img 
+                src="/shawn_elizy.jpg" 
+                alt="Shawn Elizy Hotel Venue" 
+                loading="lazy"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover/venue:scale-105" 
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent" />
+              <div className="absolute bottom-2 left-2.5">
+                <p className="text-white font-black text-xs uppercase tracking-tight drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                  Shawn Elizy 🎩✨
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-1.5 text-[9px] font-black uppercase text-white/80 font-sans">
+              <div className="p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl flex flex-col justify-center">
+                <span className="text-white/40 text-[7px] tracking-wider mb-0.5">DATE</span>
+                <span>14 June 2026</span>
+              </div>
+              <div className="p-1 bg-white/[0.03] border border-white/[0.06] rounded-xl flex flex-col justify-center">
+                <span className="text-white/40 text-[7px] tracking-wider mb-0.5">TIME</span>
+                <span>12:00 PM onwards</span>
+              </div>
+            </div>
           </div>
 
           {/* Price block */}
-          <div className="mb-3 sm:mb-5">
-            <div className="flex items-baseline gap-2">
-              <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">₹1000</span>
-              <span className="text-white/80 text-xs font-black uppercase tracking-widest">/ pass</span>
+          <div className="space-y-0.5">
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight leading-none">₹1000</span>
+              <span className="text-white/80 text-[10px] font-black uppercase tracking-widest">/ pass</span>
             </div>
-            <span className="text-cyan-400 text-[10px] uppercase tracking-widest font-black mt-1.5 block">
+            <span className="text-cyan-400 text-[9px] uppercase tracking-widest font-black block">
               Super Stallion
             </span>
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-white/[0.06] w-full mb-3 sm:mb-5" />
+          <div className="h-px bg-white/[0.06] w-full" />
 
-          {/* Features list */}
-          <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
-            <h3 className="text-white font-black uppercase tracking-[0.25em] text-[10px]">
-              Your pass covers
+          {/* Cost Breakdown */}
+          <div className="space-y-1">
+            <h3 className="text-white font-black uppercase tracking-[0.15em] text-[9px]">
+              📊 TRANSPARENT COST BREAKDOWN
             </h3>
-            <ul className="space-y-1.5 sm:space-y-2">
+            <ul className="space-y-1">
               {features.map((feature, i) => (
-                <li key={i} className="flex items-center gap-2.5">
-                  <div className="w-4.5 h-4.5 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
-                    <Check className="w-2.5 h-2.5 text-cyan-400" strokeWidth={3} />
-                  </div>
-                  <span className="text-white text-xs font-black font-sans">
-                    {feature.label}
+                <li key={i} className="flex items-center justify-between border-b border-white/[0.03] pb-1 text-[11px] font-sans font-bold text-white/95">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-[9px] text-cyan-400">✔</span> {feature.label}
                   </span>
+                  <span className="font-mono text-cyan-400 text-[11px]">{feature.cost}</span>
                 </li>
               ))}
             </ul>
@@ -106,76 +130,44 @@ export function PassCard({
         </div>
 
         {/* ═══ RIGHT SIDE — QR Code & Form Link ═══ */}
-        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6 flex flex-col items-center justify-center gap-3 sm:gap-4">
+        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6 flex flex-col items-center justify-center gap-3">
 
           {/* QR Code Container */}
           <div className="relative group">
             {/* Glow ring */}
             <div className="absolute -inset-3 bg-cyan-500/[0.06] rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
 
-            <div className="relative p-3.5 bg-black/60 border border-white/[0.08] rounded-xl overflow-hidden">
-              {/* Laser sweep */}
-              <div
-                className="absolute left-0 w-full h-[2px] bg-cyan-400 shadow-[0_0_12px_#22d3ee,0_0_4px_#22d3ee] pointer-events-none z-20"
-                style={{ animation: 'laserSweep 3.5s infinite ease-in-out' }}
+            <div className="relative p-2.5 bg-black/60 border border-white/[0.08] rounded-xl flex flex-col items-center justify-center">
+              <img 
+                src="/payment_qr.jpg" 
+                alt="Rishabh Agrawal UPI QR Code" 
+                loading="lazy" 
+                className="w-[125px] h-[165px] sm:w-[150px] sm:h-[200px] object-contain rounded-lg relative z-10"
               />
-              {/* Corner brackets */}
-              <div className="absolute top-1.5 left-1.5 w-2.5 h-2.5 border-t-2 border-l-2 border-cyan-400/60" />
-              <div className="absolute top-1.5 right-1.5 w-2.5 h-2.5 border-t-2 border-r-2 border-cyan-400/60" />
-              <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b-2 border-l-2 border-cyan-400/60" />
-              <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b-2 border-r-2 border-cyan-400/60" />
-
-              <svg width="80" height="80" className="sm:w-[120px] sm:h-[120px]" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" style={{}} >
-                <rect x="10" y="10" width="40" height="40" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path d="M20 20H40V40H20V20Z" fill="currentColor" />
-                <rect x="130" y="10" width="40" height="40" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path d="M140 20H160V40H140V20Z" fill="currentColor" />
-                <rect x="10" y="130" width="40" height="40" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path d="M20 140H40V160H20V140Z" fill="currentColor" />
-                <rect x="60" y="20" width="8" height="8" fill="currentColor" />
-                <rect x="80" y="20" width="8" height="8" fill="currentColor" />
-                <rect x="100" y="20" width="8" height="8" fill="currentColor" />
-                <rect x="60" y="40" width="8" height="8" fill="currentColor" />
-                <rect x="90" y="40" width="8" height="8" fill="currentColor" />
-                <rect x="110" y="40" width="8" height="8" fill="currentColor" />
-                <rect x="20" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="40" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="60" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="80" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="100" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="120" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="140" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="160" y="60" width="8" height="8" fill="currentColor" />
-                <rect x="60" y="80" width="16" height="8" fill="currentColor" />
-                <rect x="90" y="80" width="8" height="16" fill="currentColor" />
-                <rect x="110" y="80" width="16" height="8" fill="currentColor" />
-                <rect x="140" y="80" width="8" height="8" fill="currentColor" />
-                <rect x="80" y="100" width="8" height="8" fill="currentColor" />
-                <rect x="100" y="100" width="16" height="16" fill="currentColor" />
-                <rect x="130" y="100" width="8" height="8" fill="currentColor" />
-                <rect x="150" y="100" width="16" height="8" fill="currentColor" />
-                <rect x="60" y="120" width="8" height="8" fill="currentColor" />
-                <rect x="80" y="120" width="16" height="8" fill="currentColor" />
-                <rect x="120" y="120" width="8" height="16" fill="currentColor" />
-                <rect x="140" y="120" width="8" height="8" fill="currentColor" />
-                <rect x="60" y="140" width="16" height="16" fill="currentColor" />
-                <rect x="90" y="140" width="8" height="8" fill="currentColor" />
-                <rect x="110" y="140" width="16" height="8" fill="currentColor" />
-                <rect x="150" y="140" width="8" height="16" fill="currentColor" />
-                <rect x="90" y="160" width="16" height="8" fill="currentColor" />
-                <rect x="120" y="160" width="8" height="8" fill="currentColor" />
-                <rect x="130" y="160" width="16" height="8" fill="currentColor" />
-              </svg>
             </div>
           </div>
 
           {/* Payment instruction */}
-          <div className="text-center space-y-1.5">
-            <p className="text-white text-sm font-black uppercase tracking-[0.15em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-              Pay to this QR
+          <div className="w-full text-center space-y-1.5">
+            <p className="text-white text-xs sm:text-sm font-black uppercase tracking-[0.15em] drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+              Scan to Pay (₹1000)
             </p>
-            <p className="text-white/80 text-[10px] font-bold font-sans leading-relaxed max-w-[240px] mx-auto">
-              Scan using any UPI app (GPay, PhonePe, Paytm). After payment, fill the registration form.
+            <div className="bg-white/[0.03] border border-white/[0.08] px-2.5 py-1.5 rounded-xl text-center space-y-1 w-full">
+              <div>
+                <p className="text-white/40 text-[7.5px] uppercase tracking-widest font-mono">Primary UPI ID</p>
+                <p className="text-cyan-400 text-[11px] font-mono font-bold select-all cursor-pointer leading-tight" title="Double click to copy">
+                  agrawalrishabh546@okicici
+                </p>
+              </div>
+              <div className="border-t border-white/5 pt-1">
+                <p className="text-white/40 text-[7.5px] uppercase tracking-widest font-mono">Alternate UPI ID</p>
+                <p className="text-cyan-400 text-[11px] font-mono font-bold select-all cursor-pointer leading-tight" title="Double click to copy">
+                  917923031@ybl
+                </p>
+              </div>
+            </div>
+            <p className="text-white/60 text-[9.5px] font-bold font-sans leading-relaxed max-w-[220px] mx-auto">
+              Pay ₹1000 using GPay, PhonePe, Paytm or any UPI app, then fill the form below.
             </p>
           </div>
 
@@ -187,19 +179,13 @@ export function PassCard({
             href={formUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="group/btn w-full flex items-center justify-center gap-2 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] hover:border-white/15 px-4 py-2.5 rounded-xl transition-all duration-300 cursor-pointer"
+            className="group/btn w-full flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 border border-cyan-400/25 px-4 py-2.5 rounded-xl transition-all duration-300 cursor-pointer shadow-lg shadow-cyan-500/10 hover:shadow-cyan-500/30 transform hover:-translate-y-0.5 active:translate-y-0"
           >
-            <span className="text-white group-hover/btn:text-white text-xs font-black uppercase tracking-widest transition-colors">
+            <span className="text-black text-xs font-black uppercase tracking-widest transition-colors">
               Open Registration Form
             </span>
-            <ExternalLink className="w-3.5 h-3.5 text-white/40 group-hover/btn:text-cyan-400 transition-colors" />
+            <ExternalLink className="w-3.5 h-3.5 text-black/80 group-hover/btn:text-black transition-colors" />
           </a>
-
-          {/* Micro note */}
-          <div className="flex items-center gap-1.5 text-white/60 font-bold text-[9px] font-sans">
-            <AlertCircle className="w-3 h-3 shrink-0" />
-            <span>Details must match your official ID</span>
-          </div>
         </div>
       </div>
     </div>
