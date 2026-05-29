@@ -209,8 +209,8 @@ export default function DeckPlayer() {
       youtubeContainerRef.current.appendChild(playerDiv);
 
       playerRef.current = new YT.Player(playerDiv, {
-        height: '0',
-        width: '0',
+        height: '200',
+        width: '200',
         videoId: SONGS[currentIndex].youtubeId,
         playerVars: {
           autoplay: isPlaying ? 1 : 0,
@@ -224,6 +224,12 @@ export default function DeckPlayer() {
         events: {
           onReady: () => {
             setApiReady(true);
+            try {
+              playerRef.current.unMute();
+              playerRef.current.setVolume(100);
+            } catch (e) {
+              console.warn("YouTube Player unMute/setVolume onReady error:", e);
+            }
             if (isPlaying) {
               playerRef.current.playVideo();
             }
@@ -268,6 +274,13 @@ export default function DeckPlayer() {
       const currentVideoId = playerRef.current.getVideoData?.()?.video_id;
       const targetVideoId = SONGS[currentIndex].youtubeId;
 
+      try {
+        playerRef.current.unMute();
+        playerRef.current.setVolume(100);
+      } catch (e) {
+        console.warn("YouTube Player unMute/volume error:", e);
+      }
+
       if (currentVideoId !== targetVideoId) {
         if (isPlaying) {
           playerRef.current.loadVideoById(targetVideoId);
@@ -285,6 +298,39 @@ export default function DeckPlayer() {
       console.warn("YouTube Player Control Error:", e);
     }
   }, [currentIndex, isPlaying, apiReady]);
+
+  // Autoplay recovery listener: attempt to play on first user interaction if blocked
+  useEffect(() => {
+    if (!apiReady || !isPlaying || !playerRef.current) return;
+
+    const resumeAudio = () => {
+      try {
+        if (playerRef.current && typeof playerRef.current.getPlayerState === 'function') {
+          const state = playerRef.current.getPlayerState();
+          if (state === 5 || state === 2 || state === -1 || state === 3) {
+            playerRef.current.unMute();
+            playerRef.current.setVolume(100);
+            playerRef.current.playVideo();
+          }
+        }
+      } catch (e) {
+        console.warn("Failed to resume audio on interaction:", e);
+      }
+      cleanup();
+    };
+
+    const cleanup = () => {
+      window.removeEventListener('click', resumeAudio);
+      window.removeEventListener('keydown', resumeAudio);
+      window.removeEventListener('touchstart', resumeAudio);
+    };
+
+    window.addEventListener('click', resumeAudio);
+    window.addEventListener('keydown', resumeAudio);
+    window.addEventListener('touchstart', resumeAudio);
+
+    return cleanup;
+  }, [apiReady, isPlaying, currentIndex]);
 
   // Sync state changes with the outside world
   useEffect(() => {
@@ -415,7 +461,18 @@ export default function DeckPlayer() {
       </AnimatePresence>
 
       {/* Hidden YouTube Player Target Div */}
-      <div ref={youtubeContainerRef} className="absolute w-0 h-0 opacity-0 pointer-events-none" />
+      <div 
+        ref={youtubeContainerRef} 
+        className="absolute pointer-events-none" 
+        style={{
+          position: 'absolute',
+          top: '-9999px',
+          left: '-9999px',
+          width: '200px',
+          height: '200px',
+          opacity: 0,
+        }}
+      />
     </div>
   );
 }
