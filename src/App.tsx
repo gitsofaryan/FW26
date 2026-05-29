@@ -27,7 +27,7 @@ const InstagramIcon = ({ size = 16, className = "" }: { size?: number, className
 );
 import type { PillNavItem } from './components/PillNav';
 import DeckPlayer from './components/DeckPlayer';
-import PassCard from './components/PassCard';
+import { PassCard } from './components/PassCard';
 import { Hyperspeed, hyperspeedPresets } from './components/Hyperspeed';
 
 /* ─── Navigation Data ─── */
@@ -418,8 +418,8 @@ export default function App() {
               </div>
             </motion.div>
 
-            {/* Scrollable Container with Transparent PassCard */}
-            <div className="relative z-10 w-full min-h-screen pt-24 pb-32 flex items-center justify-center">
+            {/* Fullscreen non-scrollable container for PassCard */}
+            <div className="relative z-10 w-full h-screen flex items-center justify-center overflow-hidden pt-12 pb-16">
               <PassCard
                 formUrl="https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform"
                 className="bg-transparent border-none"

@@ -200,7 +200,7 @@ export default function DeckPlayer() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key.toLowerCase() === 'n') {
+      if (e.shiftKey && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         handleNext();
       }
