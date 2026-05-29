@@ -200,6 +200,47 @@ export default function DeckPlayer() {
     }
   };
 
+  // Sync state changes with the outside world
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('music:state', { detail: { isPlaying } }));
+  }, [isPlaying]);
+
+  // Listen to remote commands from navigation
+  useEffect(() => {
+    const handlePauseMusic = () => {
+      setIsPlaying(false);
+      if (iframeRef.current) iframeRef.current.src = '';
+    };
+    const handlePlayMusic = () => {
+      setIsPlaying(true);
+      if (iframeRef.current) {
+        iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[currentIndex].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
+      }
+    };
+    const handleToggleMusic = () => {
+      setIsPlaying(prev => {
+        const nextPlaying = !prev;
+        if (iframeRef.current) {
+          if (nextPlaying) {
+            iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[currentIndex].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
+          } else {
+            iframeRef.current.src = '';
+          }
+        }
+        return nextPlaying;
+      });
+    };
+
+    window.addEventListener('music:pause', handlePauseMusic);
+    window.addEventListener('music:play', handlePlayMusic);
+    window.addEventListener('music:toggle', handleToggleMusic);
+    return () => {
+      window.removeEventListener('music:pause', handlePauseMusic);
+      window.removeEventListener('music:play', handlePlayMusic);
+      window.removeEventListener('music:toggle', handleToggleMusic);
+    };
+  }, [currentIndex]);
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
@@ -212,6 +253,7 @@ export default function DeckPlayer() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [currentIndex, isPlaying]);
+
 
   const activeSong = SONGS[currentIndex];
   const nextSong = SONGS[(currentIndex + 1) % SONGS.length];

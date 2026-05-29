@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import FaultyTerminalBackground from './components/FaultyTerminalBackground';
 import MasonryGallery from './components/MasonryGallery';
 import type { MasonryItem } from './components/MasonryGallery';
-import { Plus, Send, X, Music, Loader2, Upload } from 'lucide-react';
+import { Plus, Send, X, Music, Loader2, Upload, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import RollingCounter from './components/RollingCounter';
 import PillNav from './components/PillNav';
-import { fetchGalleryItems, addGalleryItem, uploadImage, deleteGalleryItem } from './lib/gallery';
+import { fetchGalleryItems, addGalleryItem, deleteGalleryItem } from './lib/gallery';
 
 import type { PillNavItem } from './components/PillNav';
 import DeckPlayer from './components/DeckPlayer';
@@ -21,18 +21,7 @@ const NAV_ITEMS: PillNavItem[] = [
 ];
 
 /* ─── Gallery Data ─── */
-const INITIAL_GALLERY_ITEMS: MasonryItem[] = [
-  { id: '1', img: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=600', height: 400, enrollmentNumber: 'Mountain Lake' },
-  { id: '2', img: 'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?auto=format&fit=crop&q=80&w=600', height: 250, enrollmentNumber: 'Alpine Meadow' },
-  { id: '3', img: 'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&q=80&w=600', height: 600, enrollmentNumber: 'Forest Trail' },
-  { id: '4', img: 'https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&q=80&w=600', height: 350, enrollmentNumber: 'Coastal Cliffs' },
-  { id: '5', img: 'https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80&w=600', height: 500, enrollmentNumber: 'Desert Dunes' },
-  { id: '6', img: 'https://images.unsplash.com/photo-1500673922987-e212871fec22?auto=format&fit=crop&q=80&w=600', height: 300, enrollmentNumber: 'Northern Lights' },
-  { id: '7', img: 'https://images.unsplash.com/photo-1426604966848-d7adac402bdb?auto=format&fit=crop&q=80&w=600', height: 450, enrollmentNumber: 'Rocky Falls' },
-  { id: '8', img: 'https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&q=80&w=600', height: 280, enrollmentNumber: 'Green Hills' },
-  { id: '9', img: 'https://images.unsplash.com/photo-1518098268026-4e89f1a2cd8e?auto=format&fit=crop&q=80&w=600', height: 550, enrollmentNumber: 'Sunrise Peak' },
-  { id: '10', img: 'https://images.unsplash.com/photo-1493246507139-91e8bef99c02?auto=format&fit=crop&q=80&w=600', height: 320, enrollmentNumber: 'Sunset Valley' },
-];
+const INITIAL_GALLERY_ITEMS: MasonryItem[] = [];
 
 /* ─── Grid Multiplier ─── */
 const GRID_MUL: [number, number] = [2, 1];
@@ -58,10 +47,46 @@ export default function App() {
   const [galleryLoading, setGalleryLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Music active audio play state (for the nav button indicator)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(true);
+  useEffect(() => {
+    const handleStateChange = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setIsAudioPlaying(customEvent.detail.isPlaying);
+    };
+    window.addEventListener('music:state', handleStateChange);
+    return () => window.removeEventListener('music:state', handleStateChange);
+  }, []);
+
+  // Click outside to close DeckPlayer
+  useEffect(() => {
+    if (!showMusic) return;
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      // Check if click is inside player or toggle buttons
+      const isPlayerClick = target.closest('.deck-player-container');
+      const isToggleClick = target.closest('.music-toggle-btn');
+      
+      if (!isPlayerClick && !isToggleClick) {
+        setShowMusic(false);
+      }
+    };
+
+    // Use a tiny timeout to avoid immediate trigger during the opening click
+    const timer = setTimeout(() => {
+      window.addEventListener('click', handleGlobalClick);
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('click', handleGlobalClick);
+    };
+  }, [showMusic]);
+
 
   // Modal form states
   const [newEnrollmentNumber, setNewEnrollmentNumber] = useState('');
-  const [newPostImage, setNewPostImage] = useState('');
   const [newPostHeight, setNewPostHeight] = useState(300);
   const [newPostFile, setNewPostFile] = useState<File | null>(null);
 
@@ -73,7 +98,6 @@ export default function App() {
       if (items.length > 0) {
         setGalleryItems(items);
       }
-      // If Supabase returns empty or fails, keep the hardcoded fallback items
       setGalleryLoading(false);
     };
     loadGallery();
@@ -102,33 +126,19 @@ export default function App() {
   // Function to add memory post (with Supabase integration)
   const handleAddPostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newEnrollmentNumber || (!newPostImage && !newPostFile)) return;
+    if (!newEnrollmentNumber || !newPostFile) return;
     setIsSubmitting(true);
 
     try {
-      let imageUrl = newPostImage;
-
-      // If a file was selected, upload it first
-      if (newPostFile) {
-        const uploadedUrl = await uploadImage(newPostFile);
-        if (uploadedUrl) {
-          imageUrl = uploadedUrl;
-        } else {
-          console.error('Image upload failed');
-          setIsSubmitting(false);
-          return;
-        }
-      }
-
-      // Try Supabase insert first
-      const newItem = await addGalleryItem(newEnrollmentNumber, imageUrl, newPostHeight);
+      // Try Supabase insert and upload first
+      const newItem = await addGalleryItem(newEnrollmentNumber, newPostFile, newPostHeight);
       if (newItem) {
         setGalleryItems(prev => [newItem, ...prev]);
       } else {
-        // Fallback: add locally if Supabase fails
+        // Fallback: add locally if Supabase fails (create a local object URL for preview)
         const localItem: MasonryItem = {
           id: Date.now().toString(),
-          img: imageUrl,
+          img: URL.createObjectURL(newPostFile),
           height: newPostHeight,
           enrollmentNumber: newEnrollmentNumber,
         };
@@ -136,7 +146,6 @@ export default function App() {
       }
 
       setNewEnrollmentNumber('');
-      setNewPostImage('');
       setNewPostHeight(300);
       setNewPostFile(null);
       setIsAddModalOpen(false);
@@ -278,7 +287,8 @@ export default function App() {
         {/* Global Music Toggle Button */}
         <button
           onClick={() => setShowMusic(!showMusic)}
-          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 ${showMusic ? 'bg-white/20 text-white hover:bg-white/30' : 'bg-white/10 text-white/70 hover:text-white hover:bg-white/20'}`}
+          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 music-toggle-btn hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${showMusic ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'}`}
+          title="Toggle player deck"
         >
           <Music size={isMobile ? 16 : 20} className={showMusic ? "animate-pulse" : ""} />
         </button>
@@ -296,6 +306,15 @@ export default function App() {
           className="pointer-events-auto shadow-2xl"
           baseColor="rgba(9, 9, 11, 0.9)"
         />
+
+        {/* Global Play/Pause Control Button */}
+        <button
+          onClick={() => window.dispatchEvent(new Event('music:toggle'))}
+          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${isAudioPlaying ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'}`}
+          title={isAudioPlaying ? "Pause Music" : "Play Music"}
+        >
+          {isAudioPlaying ? <Pause size={isMobile ? 16 : 20} /> : <Play size={isMobile ? 16 : 20} />}
+        </button>
       </div>
 
       {/* ═══════════ TAB CONTENT ═══════════ */}
@@ -438,11 +457,16 @@ export default function App() {
             </motion.div>
 
             {/* Responsive container for PassCard — scrollable on small phones */}
-            <div className="relative z-10 w-full min-h-screen sm:h-screen flex items-center justify-center sm:overflow-hidden pt-16 pb-20 sm:pt-12 sm:pb-16 px-2 sm:px-0">
-              <PassCard
-                formUrl="https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform"
-                className="bg-transparent border-none"
-              />
+            <div 
+              onClick={() => setActiveTab('main')}
+              className="relative z-10 w-full min-h-screen sm:h-screen flex items-center justify-center sm:overflow-hidden pt-16 pb-20 sm:pt-12 sm:pb-16 px-2 sm:px-0 cursor-pointer"
+            >
+              <div onClick={(e) => e.stopPropagation()} className="cursor-default">
+                <PassCard
+                  formUrl="https://docs.google.com/forms/d/e/1FAIpQLSeserd7A5CwQ9j6kn6DlHYxh2-QLRq6TME760itTc_NocNs5Q/viewform"
+                  className="bg-transparent border-none"
+                />
+              </div>
             </div>
           </motion.div>
         )}
@@ -451,12 +475,16 @@ export default function App() {
       {/* ═══════════ ADD MEMORY MODAL ═══════════ */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div 
+            onClick={() => setIsAddModalOpen(false)}
+            className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50 cursor-pointer"
+          >
             <motion.div
+              onClick={(e) => e.stopPropagation()}
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="w-full max-w-md bg-zinc-950 border border-white/10 p-6 sm:p-8 rounded-3xl space-y-5 sm:space-y-6 shadow-2xl relative max-h-[85vh] overflow-y-auto"
+              className="w-full max-w-md bg-zinc-950 border border-white/10 p-6 sm:p-8 rounded-3xl space-y-5 sm:space-y-6 shadow-2xl relative max-h-[85vh] overflow-y-auto cursor-default"
             >
               <button
                 onClick={() => setIsAddModalOpen(false)}
@@ -497,32 +525,11 @@ export default function App() {
                         const file = e.target.files?.[0];
                         if (file) {
                           setNewPostFile(file);
-                          setNewPostImage(''); // Clear URL if file chosen
                         }
                       }}
                       disabled={isSubmitting}
                     />
                   </label>
-                </div>
-
-                <div className="flex items-center gap-3 text-white/20 text-[10px] font-mono uppercase tracking-widest">
-                  <div className="flex-1 h-px bg-white/10" />
-                  <span>or paste URL</span>
-                  <div className="flex-1 h-px bg-white/10" />
-                </div>
-
-                <div className="space-y-1">
-                  <input
-                    type="url"
-                    value={newPostImage}
-                    onChange={(e) => {
-                      setNewPostImage(e.target.value);
-                      if (e.target.value) setNewPostFile(null); // Clear file if URL typed
-                    }}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full px-4 py-2.5 bg-white/5 border border-white/10 focus:border-cyan-500 rounded-xl text-sm text-white placeholder-white/20 focus:outline-none transition-all font-sans"
-                    disabled={isSubmitting}
-                  />
                 </div>
 
                 <div className="space-y-1">
@@ -547,7 +554,7 @@ export default function App() {
 
                 <button
                   type="submit"
-                  disabled={isSubmitting || (!newPostImage && !newPostFile)}
+                  disabled={isSubmitting || !newPostFile}
                   className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold rounded-xl text-xs uppercase tracking-widest transition-all cursor-pointer mt-6 flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20"
                 >
                   {isSubmitting ? (
@@ -578,7 +585,7 @@ export default function App() {
             pointerEvents: showMusic ? 'auto' : 'none'
           }}
         >
-          <div className="filter drop-shadow-2xl">
+          <div className="filter drop-shadow-2xl deck-player-container">
             <DeckPlayer />
           </div>
         </div>
