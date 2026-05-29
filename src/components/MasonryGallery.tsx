@@ -49,19 +49,7 @@ const useMeasure = <T extends HTMLElement>() => {
   return [ref, size] as const;
 };
 
-/** Utility to ensure images are loaded before layout/animation */
-const preloadImages = async (urls: string[]): Promise<void> => {
-  await Promise.all(
-    urls.map(
-      src =>
-        new Promise<void>(resolve => {
-          const img = new Image();
-          img.src = src;
-          img.onload = img.onerror = () => resolve();
-        })
-    )
-  );
-};
+// Images load natively using browser lazy-loading and fade-in once ready
 
 export interface MasonryItem {
   id: string;
@@ -114,7 +102,6 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
   );
 
   const [containerRef, { width }] = useMeasure<HTMLDivElement>();
-  const [imagesReady, setImagesReady] = useState(false);
   const hasMounted = useRef(false);
 
   const getInitialPosition = (item: GridItem) => {
@@ -140,10 +127,6 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
     }
   };
 
-  useEffect(() => {
-    preloadImages(items.map(i => i.img)).then(() => setImagesReady(true));
-  }, [items]);
-
   const { grid, containerHeight } = useMemo(() => {
     if (!width) return { grid: [] as GridItem[], containerHeight: 0 };
 
@@ -165,7 +148,7 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
   }, [columns, items, width]);
 
   useLayoutEffect(() => {
-    if (!imagesReady || !grid.length) return;
+    if (!grid.length) return;
 
     grid.forEach((item, index) => {
       const element = document.querySelector(`[data-masonry-key="${item.id}"]`);
@@ -205,7 +188,7 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
     });
 
     if (grid.length > 0) hasMounted.current = true;
-  }, [grid, imagesReady, stagger, animateFrom, blurToFocus, duration, ease]);
+  }, [grid, stagger, animateFrom, blurToFocus, duration, ease]);
 
   const handleMouseEnter = (_id: string, element: HTMLElement) => {
     if (scaleOnHover) {
@@ -246,14 +229,20 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
           onMouseEnter={e => handleMouseEnter(item.id, e.currentTarget)}
           onMouseLeave={e => handleMouseLeave(item.id, e.currentTarget)}
         >
-          <div
-            className="w-full h-full bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${item.img})` }}
-          >
-            {colorShiftOnHover && (
-              <div className="color-overlay absolute inset-0 bg-gradient-to-tr from-cyan-500/40 to-purple-500/40 opacity-0 pointer-events-none transition-opacity" />
-            )}
-          </div>
+          <img
+            src={item.img}
+            alt="Class of 2026 Memory"
+            loading="lazy"
+            width={item.w}
+            height={item.h}
+            className="w-full h-full object-cover transition-opacity duration-500 opacity-0"
+            onLoad={(e) => {
+              (e.currentTarget as HTMLImageElement).classList.remove('opacity-0');
+            }}
+          />
+          {colorShiftOnHover && (
+            <div className="color-overlay absolute inset-0 bg-gradient-to-tr from-cyan-500/40 to-purple-500/40 opacity-0 pointer-events-none transition-opacity" />
+          )}
           {item.enrollmentNumber && (
             <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 to-transparent opacity-0 hover:opacity-100 transition-opacity duration-300">
               <p className="text-white text-xs font-medium uppercase tracking-wider">{item.enrollmentNumber}</p>
