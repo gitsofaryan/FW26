@@ -3,6 +3,11 @@
 @import "tailwindcss";
 
 @layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255, 255, 255, 0.12) rgba(10, 10, 10, 0.95);
+  }
   body {
     @apply bg-black text-white font-sans antialiased overflow-x-hidden;
   }
@@ -190,4 +195,14 @@
   90% { clip: rect(14px, 9999px, 32px, 0); }
   95% { clip: rect(49px, 9999px, 71px, 0); }
   100% { clip: rect(81px, 9999px, 27px, 0); }
+}
+
+@media (max-width: 640px) {
+  .crt-overlay {
+    background: linear-gradient(
+      rgba(18, 16, 16, 0) 50%, 
+      rgba(0, 0, 0, 0.15) 50%
+    );
+    background-size: 100% 6px;
+  }
 }

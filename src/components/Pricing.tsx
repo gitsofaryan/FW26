@@ -17,30 +17,32 @@ interface PricingSectionProps {
 }
 
 const defaultFeatures: PricingFeature[] = [
-  { label: 'Full Gallery Access', included: true },
-  { label: 'Event Entry Ticket', included: true },
-  { label: 'High-Res Downloads', included: true },
-  { label: 'Exclusive Afterparty', included: true },
-  { label: 'VIP Seating Add-on', included: true, isAddOn: true },
+  { label: '🍽️ Food', included: true },
+  { label: '🎧 DJ & Music', included: true },
+  { label: '🎀 Decorations', included: true },
+  { label: '📸 Photography', included: true },
+  { label: '🎁 Gifts', included: true },
+  { label: '🎯 Games & Activities', included: true },
+  { label: '🛡️ Security & Arrangements', included: true },
 ];
 
 export function PricingSection({
   className,
   heading = "Farewell 2026 Passes",
   subheading = "Secure your spot at the event. Transparent pricing, no hidden fees.",
-  price = "₹1500",
+  price = "₹1000",
   feeLabel = "Standard Entry Pass",
   features = defaultFeatures,
 }: PricingSectionProps) {
   return (
     <div className={cn("w-full max-w-[1200px] mx-auto p-4 md:p-6 font-mono pt-20 md:pt-32 relative z-10", className)}>
       <div className="flex flex-col lg:flex-row bg-transparent border border-white/10 rounded-[32px] overflow-hidden min-h-[500px] shadow-2xl shadow-cyan-500/10">
-        
+
         {/* Left Section - Hero & CTA */}
         <div className="flex-1 p-8 md:p-12 lg:p-16 flex flex-col justify-between relative">
           {/* Subtle cyan glow in background */}
           <div className="absolute top-0 left-0 w-full h-full bg-cyan-500/5 blur-[100px] pointer-events-none" />
-          
+
           <div className="space-y-6 relative z-10">
             <h2 className="text-4xl md:text-5xl lg:text-[56px] leading-[1.1] font-bold tracking-tight text-white uppercase">
               {heading}

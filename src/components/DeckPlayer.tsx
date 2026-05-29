@@ -149,7 +149,9 @@ const swipeVariants = {
   },
   exit: (direction: number) => ({
     zIndex: 3,
-    x: direction > 0 ? 250 : -250,
+    x: typeof window !== 'undefined' && window.innerWidth < 640
+      ? (direction > 0 ? 200 : -200)
+      : (direction > 0 ? 250 : -250),
     opacity: 0,
     scale: 1,
     rotate: direction > 0 ? 10 : -10,
@@ -200,7 +202,7 @@ export default function DeckPlayer() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.shiftKey && e.key.toLowerCase() === 'n') {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') {
         e.preventDefault();
         handleNext();
       }
@@ -216,7 +218,7 @@ export default function DeckPlayer() {
   const nextNextSong = SONGS[(currentIndex + 2) % SONGS.length];
 
   return (
-    <div className="relative w-[300px] h-[340px] flex items-center justify-center perspective-[1000px]">
+    <div className="relative w-[260px] h-[300px] sm:w-[300px] sm:h-[340px] flex items-center justify-center perspective-[1000px]">
       
       {/* Background Stack 2 */}
       <motion.div

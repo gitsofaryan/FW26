@@ -7,7 +7,7 @@
  * - Custom tab switching state integration
  */
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 
 
@@ -64,6 +64,13 @@ export const PillNav: React.FC<PillNavProps> = ({
   const logoTweenRef = useRef<gsap.core.Tween | null>(null);
   const navItemsRef = useRef<HTMLDivElement | null>(null);
   const logoRef = useRef<HTMLDivElement | null>(null);
+  const [compact, setCompact] = useState(window.innerWidth < 640);
+
+  useEffect(() => {
+    const handleResize = () => setCompact(window.innerWidth < 640);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const renderLogo = () => {
     if (!logo) return null;
@@ -226,9 +233,9 @@ export const PillNav: React.FC<PillNavProps> = ({
     '--pill-bg': pillColor,
     '--hover-text': hoveredPillTextColor,
     '--pill-text': pillTextColor,
-    '--nav-h': '56px',
-    '--pill-pad-x': '24px',
-    '--pill-gap': '8px'
+    '--nav-h': compact ? '48px' : '56px',
+    '--pill-pad-x': compact ? '14px' : '24px',
+    '--pill-gap': compact ? '6px' : '8px'
   } as React.CSSProperties;
 
   return (
@@ -296,13 +303,13 @@ export const PillNav: React.FC<PillNavProps> = ({
                   />
                   <span className="label-stack relative inline-block leading-none z-[2] overflow-hidden py-1">
                     <span
-                      className="pill-label relative z-[2] inline-block font-bold text-sm tracking-widest"
+                      className="pill-label relative z-[2] inline-block font-bold text-xs sm:text-sm tracking-widest"
                       style={{ willChange: 'transform' }}
                     >
                       {item.label}
                     </span>
                     <span
-                      className="pill-label-hover absolute left-0 top-1 z-[3] inline-block w-full text-center font-bold text-sm tracking-widest"
+                      className="pill-label-hover absolute left-0 top-1 z-[3] inline-block w-full text-center font-bold text-xs sm:text-sm tracking-widest"
                       style={{
                         color: 'var(--hover-text)',
                         willChange: 'transform, opacity'

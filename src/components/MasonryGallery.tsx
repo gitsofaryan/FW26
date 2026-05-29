@@ -10,6 +10,7 @@
 
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { Trash2 } from 'lucide-react';
 
 /** Hook to handle media queries for responsive columns */
 const useMedia = (queries: string[], values: number[], defaultValue: number): number => {
@@ -89,6 +90,7 @@ export interface MasonryGalleryProps {
   colorShiftOnHover?: boolean;
   className?: string;
   itemClassName?: string;
+  onDelete?: (id: string) => void;
 }
 
 export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
@@ -102,7 +104,8 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
   blurToFocus = true,
   colorShiftOnHover = false,
   className,
-  itemClassName
+  itemClassName,
+  onDelete
 }) => {
   const columns = useMedia(
     ['(min-width: 1500px)', '(min-width: 1000px)', '(min-width: 600px)', '(min-width: 400px)'],
@@ -145,7 +148,7 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
     if (!width) return { grid: [] as GridItem[], containerHeight: 0 };
 
     const colHeights = new Array(columns).fill(0);
-    const gap = 24;
+    const gap = columns <= 2 ? 12 : 24;
     const totalGaps = (columns - 1) * gap;
     const columnWidth = (width - totalGaps) / columns;
 
@@ -234,7 +237,7 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
         <div
           key={item.id}
           data-masonry-key={item.id}
-          className={`absolute overflow-hidden cursor-pointer rounded-xl transition-shadow hover:shadow-2xl ${itemClassName ?? ''}`}
+          className={`absolute overflow-hidden cursor-pointer rounded-xl transition-shadow hover:shadow-2xl group ${itemClassName ?? ''}`}
           style={{
             willChange: 'transform, width, height, opacity, filter',
             boxShadow: '0 10px 30px -10px rgba(0,0,0,0.3)'
@@ -256,8 +259,29 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
               <p className="text-white text-xs font-medium uppercase tracking-wider">{item.title}</p>
             </div>
           )}
+          {onDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm("Are you sure you want to delete this memory?")) {
+                  onDelete(item.id);
+                }
+              }}
+              className="absolute top-2 right-2 p-1.5 rounded-full bg-black/60 hover:bg-red-500/80 border border-white/10 text-white/60 hover:text-white transition-all duration-300 opacity-0 group-hover:opacity-100 z-30 cursor-pointer shadow-md"
+              title="Delete memory"
+            >
+              <Trash2 size={14} />
+            </button>
+          )}
         </div>
       ))}
+      {grid.length === 0 && (
+        <div className="flex flex-col items-center justify-center h-[50vh] text-center">
+          <div className="text-white/20 text-6xl mb-4">📸</div>
+          <p className="text-white/40 font-mono text-sm uppercase tracking-widest">No memories yet</p>
+          <p className="text-white/20 font-sans text-xs mt-2">Be the first to post a memory!</p>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { Check, Plus, ExternalLink, AlertCircle } from 'lucide-react';
+import { Check, ExternalLink, AlertCircle } from 'lucide-react';
 import { cn } from '../utils';
 
 interface PassCardProps {
@@ -7,11 +7,13 @@ interface PassCardProps {
 }
 
 const features = [
-  { label: 'Full Gallery Access', included: true },
-  { label: 'Event Entry Ticket', included: true },
-  { label: 'High-Res Downloads', included: true },
-  { label: 'Exclusive Afterparty', included: true },
-  { label: 'VIP Seating Add-on', isAddOn: true },
+  { label: '🍽️ Food', included: true },
+  { label: '🎧 DJ & Music', included: true },
+  { label: '🎀 Decorations', included: true },
+  { label: '📸 Photography', included: true },
+  { label: '🎁 Gifts', included: true },
+  { label: '🎯 Games & Activities', included: true },
+  { label: '🛡️ Security & Arrangements', included: true },
 ];
 
 export function PassCard({
@@ -26,7 +28,7 @@ export function PassCard({
   `;
 
   return (
-    <div className={cn("w-full font-mono relative z-20 py-4 bg-transparent flex items-center justify-center border-none", className)}>
+    <div className={cn("w-full font-mono relative z-20 py-2 sm:py-4 bg-transparent flex items-center justify-center border-none", className)}>
       <style dangerouslySetInnerHTML={{ __html: laserStyle }} />
 
       {/* Dotted background pattern spanning edge-to-edge */}
@@ -49,56 +51,52 @@ export function PassCard({
       <div className="absolute inset-0 z-[2] bg-gradient-to-br from-cyan-500/[0.03] via-transparent to-purple-500/[0.02]" />
 
       {/* Content Container (Centered & bounded wide content inside the section) */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto px-6 md:px-12 flex flex-col lg:flex-row gap-6 lg:gap-8 items-stretch">
+      <div className="relative z-10 w-full max-w-[95vw] sm:max-w-4xl mx-auto px-3 sm:px-6 md:px-12 flex flex-col lg:flex-row gap-4 sm:gap-6 lg:gap-8 items-stretch">
 
         {/* ═══ LEFT SIDE — Pricing & Pass Details ═══ */}
-        <div className="flex-1 p-4 md:p-5 lg:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.06]">
+        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/[0.06]">
 
           {/* Header */}
-          <div className="space-y-2 mb-5">
+          <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-5">
             <div className="space-y-1">
               <span className="text-[10px] uppercase tracking-[0.25em] text-white/60 font-black block">
                 Farewell 2026
               </span>
-              <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight leading-[1.1]">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white uppercase tracking-tight leading-[1.1]">
                 Event<br />Pass
               </h2>
             </div>
-            <p className="text-white/80 text-xs font-bold font-sans leading-relaxed max-w-sm">
+            <p className="text-white text-xs font-extrabold font-sans leading-relaxed max-w-sm">
               Secure your spot at the event. Transparent pricing, no hidden fees.
             </p>
           </div>
 
           {/* Price block */}
-          <div className="mb-5">
-            <div className="flex items-baseline gap-2.5">
-              <span className="text-4xl md:text-5xl font-black text-white tracking-tight">₹1500</span>
-              <span className="text-white/65 text-xs font-black uppercase tracking-widest">/ pass</span>
+          <div className="mb-3 sm:mb-5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">₹1000</span>
+              <span className="text-white/80 text-xs font-black uppercase tracking-widest">/ pass</span>
             </div>
             <span className="text-cyan-400 text-[10px] uppercase tracking-widest font-black mt-1.5 block">
-              Standard Entry
+              Super Stallion
             </span>
           </div>
 
           {/* Divider */}
-          <div className="h-px bg-white/[0.06] w-full mb-5" />
+          <div className="h-px bg-white/[0.06] w-full mb-3 sm:mb-5" />
 
           {/* Features list */}
-          <div className="space-y-2 mb-4">
-            <h3 className="text-white/85 font-black uppercase tracking-[0.25em] text-[10px]">
-              What's included
+          <div className="space-y-1.5 sm:space-y-2 mb-3 sm:mb-4">
+            <h3 className="text-white font-black uppercase tracking-[0.25em] text-[10px]">
+              Your pass covers
             </h3>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 sm:space-y-2">
               {features.map((feature, i) => (
                 <li key={i} className="flex items-center gap-2.5">
                   <div className="w-4.5 h-4.5 rounded-full bg-white/[0.04] border border-white/[0.06] flex items-center justify-center shrink-0">
-                    {feature.isAddOn ? (
-                      <Plus className="w-2.5 h-2.5 text-cyan-400" strokeWidth={3} />
-                    ) : (
-                      <Check className="w-2.5 h-2.5 text-cyan-400" strokeWidth={3} />
-                    )}
+                    <Check className="w-2.5 h-2.5 text-cyan-400" strokeWidth={3} />
                   </div>
-                  <span className="text-white/95 text-xs font-bold font-sans">
+                  <span className="text-white text-xs font-black font-sans">
                     {feature.label}
                   </span>
                 </li>
@@ -108,7 +106,7 @@ export function PassCard({
         </div>
 
         {/* ═══ RIGHT SIDE — QR Code & Form Link ═══ */}
-        <div className="flex-1 p-4 md:p-5 lg:p-6 flex flex-col items-center justify-center gap-4">
+        <div className="flex-1 p-3 sm:p-4 md:p-5 lg:p-6 flex flex-col items-center justify-center gap-3 sm:gap-4">
 
           {/* QR Code Container */}
           <div className="relative group">
@@ -127,7 +125,7 @@ export function PassCard({
               <div className="absolute bottom-1.5 left-1.5 w-2.5 h-2.5 border-b-2 border-l-2 border-cyan-400/60" />
               <div className="absolute bottom-1.5 right-1.5 w-2.5 h-2.5 border-b-2 border-r-2 border-cyan-400/60" />
 
-              <svg width="120" height="120" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-cyan-400/80 group-hover:text-cyan-300 transition-colors duration-500">
+              <svg width="80" height="80" className="sm:w-[120px] sm:h-[120px]" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg" style={{}} >
                 <rect x="10" y="10" width="40" height="40" stroke="currentColor" strokeWidth="4" fill="none" />
                 <path d="M20 20H40V40H20V20Z" fill="currentColor" />
                 <rect x="130" y="10" width="40" height="40" stroke="currentColor" strokeWidth="4" fill="none" />
