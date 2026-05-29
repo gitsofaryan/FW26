@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Suspense, lazy } from 'react';
 import type { MasonryItem } from './components/MasonryGallery';
-import { Plus, Send, X, Music, Loader2, Upload, Play, Pause } from 'lucide-react';
+import { Plus, Send, X, Music, Loader2, Upload, Play, Pause, Settings2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 import PillNav from './components/PillNav';
@@ -35,10 +35,21 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'main' | 'gallery' | 'pass'>('main');
   const [presetKey, setPresetKey] = useState<keyof typeof hyperspeedPresets>('one');
   const [terminalKey] = useState(0);
-  const [isPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
   const [showMusic, setShowMusic] = useState(true);
   const [galleryKey, setGalleryKey] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
+
+  // Terminal Controls
+  const [showTerminalControls, setShowTerminalControls] = useState(false);
+  const [terminalConfig, setTerminalConfig] = useState({
+    scale: window.innerWidth < 640 ? 2.5 : 1.5,
+    scanlineIntensity: window.innerWidth < 640 ? 0.3 : 1.0,
+    glitchAmount: window.innerWidth < 640 ? 1.0 : 1.2,
+    curvature: window.innerWidth < 640 ? 0.0 : 0.1,
+    brightness: 1.0,
+    tint: '#ffffff'
+  });
 
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 640);
@@ -224,23 +235,23 @@ export default function App() {
               <Suspense fallback={<div className="absolute inset-0 bg-black flex items-center justify-center"><Loader2 className="animate-spin text-cyan-500 opacity-50" /></div>}>
                 <FaultyTerminalBackground
                   key={terminalKey}
-                  scale={1.5}
+                  scale={terminalConfig.scale}
                   gridMul={GRID_MUL}
-                  digitSize={1.2}
+                  digitSize={isMobile ? 1.8 : 1.2}
                   timeScale={1}
                   pause={isPaused}
-                  scanlineIntensity={isMobile ? 0.3 : 1.0}
-                  glitchAmount={isMobile ? 1.0 : 1.2}
+                  scanlineIntensity={terminalConfig.scanlineIntensity}
+                  glitchAmount={terminalConfig.glitchAmount}
                   flickerAmount={isMobile ? 0.5 : 1.0}
                   noiseAmp={isMobile ? 0.4 : 1.0}
                   chromaticAberration={isMobile ? 0.0 : 2.0}
                   dither={isMobile ? 0.0 : 0.1}
-                  curvature={isMobile ? 0.0 : 0.1}
-                  tint="#ffffff"
-                  mouseReact={!isMobile}
-                  mouseStrength={0.5}
+                  curvature={terminalConfig.curvature}
+                  tint={terminalConfig.tint}
+                  mouseReact={true}
+                  mouseStrength={isMobile ? 1.2 : 0.5}
                   pageLoadAnimation={true}
-                  brightness={1.0}
+                  brightness={terminalConfig.brightness}
                   dpr={isMobile ? 1.0 : 1.5}
                   className="absolute inset-0 w-full h-full z-0"
                 />
@@ -249,6 +260,75 @@ export default function App() {
 
 
             </section>
+
+            {/* Terminal Controller FAB & Panel */}
+            <div className="absolute bottom-28 right-4 sm:bottom-10 sm:right-10 flex flex-col items-end gap-4 z-[60]">
+              <AnimatePresence>
+                {showTerminalControls && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    className="w-64 bg-zinc-950/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 text-white shadow-2xl origin-bottom-right"
+                  >
+                    <div className="flex items-center justify-between mb-5">
+                      <h3 className="font-mono text-xs uppercase tracking-widest text-cyan-500">Terminal Core</h3>
+                      <button onClick={() => setIsPaused(!isPaused)} className="text-white/60 hover:text-white transition-colors cursor-pointer">
+                        {isPaused ? <Play size={16} /> : <Pause size={16} />}
+                      </button>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] uppercase text-white/40 font-mono">
+                          <span>Scale</span>
+                          <span>{terminalConfig.scale.toFixed(1)}</span>
+                        </div>
+                        <input 
+                          type="range" min="0.5" max="5" step="0.1" 
+                          value={terminalConfig.scale} 
+                          onChange={(e) => setTerminalConfig({...terminalConfig, scale: parseFloat(e.target.value)})}
+                          className="w-full accent-cyan-500 bg-white/10 h-1 rounded-full appearance-none cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] uppercase text-white/40 font-mono">
+                          <span>Glitch</span>
+                          <span>{terminalConfig.glitchAmount.toFixed(1)}</span>
+                        </div>
+                        <input 
+                          type="range" min="0" max="5" step="0.1" 
+                          value={terminalConfig.glitchAmount} 
+                          onChange={(e) => setTerminalConfig({...terminalConfig, glitchAmount: parseFloat(e.target.value)})}
+                          className="w-full accent-cyan-500 bg-white/10 h-1 rounded-full appearance-none cursor-pointer"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <div className="flex justify-between text-[10px] uppercase text-white/40 font-mono">
+                          <span>Curvature</span>
+                          <span>{terminalConfig.curvature.toFixed(2)}</span>
+                        </div>
+                        <input 
+                          type="range" min="0" max="0.5" step="0.01" 
+                          value={terminalConfig.curvature} 
+                          onChange={(e) => setTerminalConfig({...terminalConfig, curvature: parseFloat(e.target.value)})}
+                          className="w-full accent-cyan-500 bg-white/10 h-1 rounded-full appearance-none cursor-pointer"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <button
+                onClick={() => setShowTerminalControls(!showTerminalControls)}
+                className={`p-3 sm:p-4 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex items-center justify-center ${showTerminalControls ? 'bg-cyan-500 text-white' : 'bg-white/10 text-white hover:bg-white/20'}`}
+              >
+                <Settings2 size={24} className={showTerminalControls ? "animate-spin" : ""} />
+              </button>
+            </div>
           </motion.div>
         )}
 
