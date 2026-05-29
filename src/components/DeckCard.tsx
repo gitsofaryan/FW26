@@ -62,7 +62,7 @@ export default function DeckCard({ song, isPlaying, onTogglePlay, onNext, onPrev
           {/* Top Info Row */}
           <div className="flex items-center gap-3">
             <div className="relative w-12 h-12 rounded-md overflow-hidden flex-shrink-0 shadow-md">
-               <img src={song.cover} alt="cover" loading="lazy" width="48" height="48" className="w-full h-full object-cover" />
+               <img src={song.cover} alt="cover" className="w-full h-full object-cover" />
             </div>
             
             <div className="flex-1 min-w-0 flex flex-col justify-center">
