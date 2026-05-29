@@ -4,7 +4,7 @@ import MasonryGallery from './components/MasonryGallery';
 import type { MasonryItem } from './components/MasonryGallery';
 import { Plus, Send, X, Music, Loader2, Upload, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-
+import RollingCounter from './components/RollingCounter';
 import PillNav from './components/PillNav';
 import { fetchGalleryItems, addGalleryItem, deleteGalleryItem } from './lib/gallery';
 
@@ -69,7 +69,7 @@ export default function App() {
       // Check if click is inside player or toggle buttons
       const isPlayerClick = target.closest('.deck-player-container');
       const isToggleClick = target.closest('.music-toggle-btn');
-      
+
       if (!isPlayerClick && !isToggleClick) {
         setShowMusic(false);
       }
@@ -346,7 +346,7 @@ export default function App() {
             </motion.div>
 
             {/* Responsive container for PassCard — scrollable on small phones */}
-            <div 
+            <div
               onClick={() => setActiveTab('main')}
               className="relative z-10 w-full min-h-screen sm:h-screen flex items-center justify-center sm:overflow-hidden pt-16 pb-20 sm:pt-12 sm:pb-16 px-2 sm:px-0 cursor-pointer"
             >
@@ -364,7 +364,7 @@ export default function App() {
       {/* ═══════════ ADD MEMORY MODAL ═══════════ */}
       <AnimatePresence>
         {isAddModalOpen && (
-          <div 
+          <div
             onClick={() => setIsAddModalOpen(false)}
             className="fixed inset-0 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 z-50 cursor-pointer"
           >

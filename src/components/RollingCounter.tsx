@@ -203,12 +203,12 @@ export function RollingCounter({
     <span style={{ ...defaultContainerStyle, ...containerStyle }}>
       <span style={{ ...defaultCounterStyle, ...counterStyle }}>
         {derivedPlaces.map((place, idx) => (
-          <Digit 
-            key={`${place}-${idx}`} 
-            place={place} 
-            value={value} 
-            height={height} 
-            digitStyle={digitStyle} 
+          <Digit
+            key={`${place}-${idx}`}
+            place={place}
+            value={value}
+            height={height}
+            digitStyle={digitStyle}
           />
         ))}
       </span>
