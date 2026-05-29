@@ -74,9 +74,17 @@ export default function App() {
     return () => window.removeEventListener('music:state', handleStateChange);
   }, []);
 
-  // Click outside to close DeckPlayer
+  // Automatically open the music player when returning to the home screen ('main')
+  useEffect(() => {
+    if (activeTab === 'main') {
+      setShowMusic(true);
+    }
+  }, [activeTab]);
+
+  // Click outside to close DeckPlayer (disabled on home screen 'main')
   useEffect(() => {
     if (!showMusic) return;
+    if (activeTab === 'main') return; // Do not close on click outside on the home screen
 
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -98,7 +106,7 @@ export default function App() {
       clearTimeout(timer);
       window.removeEventListener('click', handleGlobalClick);
     };
-  }, [showMusic]);
+  }, [showMusic, activeTab]);
 
   // Click outside to close Terminal Controller
   useEffect(() => {
