@@ -43,10 +43,10 @@ export default function App() {
   // Terminal Controls
   const [showTerminalControls, setShowTerminalControls] = useState(false);
   const [terminalConfig, setTerminalConfig] = useState({
-    scale: window.innerWidth < 640 ? 2.5 : 1.5,
+    scale: window.innerWidth < 640 ? 0.9 : 1.5,
     scanlineIntensity: window.innerWidth < 640 ? 0.3 : 1.0,
-    glitchAmount: window.innerWidth < 640 ? 1.0 : 1.2,
-    curvature: window.innerWidth < 640 ? 0.0 : 0.1,
+    glitchAmount: window.innerWidth < 640 ? 1.5 : 1.2,
+    curvature: window.innerWidth < 640 ? 0.24 : 0.1,
     brightness: 1.0,
     tint: '#ffffff'
   });
@@ -99,6 +99,29 @@ export default function App() {
       window.removeEventListener('click', handleGlobalClick);
     };
   }, [showMusic]);
+
+  // Click outside to close Terminal Controller
+  useEffect(() => {
+    if (!showTerminalControls) return;
+
+    const handleGlobalClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const isControllerClick = target.closest('.terminal-controller-container');
+
+      if (!isControllerClick) {
+        setShowTerminalControls(false);
+      }
+    };
+
+    const timer = setTimeout(() => {
+      window.addEventListener('click', handleGlobalClick);
+    }, 50);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('click', handleGlobalClick);
+    };
+  }, [showTerminalControls]);
 
 
   // Modal form states
@@ -262,7 +285,7 @@ export default function App() {
             </section>
 
             {/* Terminal Controller FAB & Panel */}
-            <div className="absolute bottom-28 right-4 sm:bottom-10 sm:right-10 flex flex-col items-end gap-4 z-[60]">
+            <div className="absolute bottom-28 right-4 sm:bottom-10 sm:right-10 flex flex-col items-end gap-4 z-[60] terminal-controller-container">
               <AnimatePresence>
                 {showTerminalControls && (
                   <motion.div 
