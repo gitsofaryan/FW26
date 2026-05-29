@@ -91,7 +91,7 @@ const SONGS: Song[] = [
     bgGradient: "#fce7f3", // Light Pink
     headerText: "APARTMENT BEATS",
     subText: "The record-breaking pop sensation that swept the globe",
-    youtubeId: "APx7k41mB-M"
+    youtubeId: "ekr2nIex040"
   },
   {
     id: '9',
@@ -102,7 +102,7 @@ const SONGS: Song[] = [
     bgGradient: "#f5f5f4", // Light Stone/Grey
     headerText: "VIE SELECTION",
     subText: "Doja Cat's bold, experimental rap track",
-    youtubeId: "j41x542qL8c"
+    youtubeId: "w6VZ4qm-e0w"
   },
   {
     id: '10',
