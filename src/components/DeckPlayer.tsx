@@ -6,6 +6,17 @@ import type { Song } from './DeckCard';
 // Original Data - Restored Gen-Z / Light Mode
 const SONGS: Song[] = [
   {
+    id: '3',
+    title: "Hum Pyaar Karne Wale",
+    artist: "Udit Narayan, Anuradha Paudwal & Qveen Herby",
+    cover: "/hum_pyaar_cover.jpg",
+    duration: "03:40:00",
+    bgGradient: "#ccfbf1", // Light Teal
+    headerText: "BOLLYWOOD REVENGE",
+    subText: "The iconic melody remixed with modern synth beats",
+    youtubeId: "Th2Op6uvNXw"
+  },
+  {
     id: '1',
     title: "Billie Jean",
     artist: "Michael Jackson",
@@ -26,17 +37,6 @@ const SONGS: Song[] = [
     headerText: "BOLLYWOOD GLIDE",
     subText: "High energy fusion of classic and modern beats",
     youtubeId: "SYsTrlxrRss"
-  },
-  {
-    id: '3',
-    title: "Hum Pyaar Karne Wale",
-    artist: "Udit Narayan, Anuradha Paudwal & Qveen Herby",
-    cover: "/hum_pyaar_cover.jpg",
-    duration: "03:40:00",
-    bgGradient: "#ccfbf1", // Light Teal
-    headerText: "BOLLYWOOD REVENGE",
-    subText: "The iconic melody remixed with modern synth beats",
-    youtubeId: "Th2Op6uvNXw"
   },
   {
     id: '4',
@@ -161,44 +161,118 @@ const swipeVariants = {
     }
   })
 };
-
 export default function DeckPlayer() {
-  const [currentIndex, setCurrentIndex] = useState(2);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
+  
+  const playerRef = useRef<any>(null);
+  const [apiReady, setApiReady] = useState(false);
+
+  // Setup handler references to avoid stale closure gotchas in callbacks
+  const nextHandlerRef = useRef<() => void>(() => {});
+  nextHandlerRef.current = () => {
+    setDirection(1);
+    setCurrentIndex((prev) => (prev + 1) % SONGS.length);
+    setIsPlaying(true);
+  };
 
   const handleNext = () => {
-    setDirection(1);
-    const nextIdx = (currentIndex + 1) % SONGS.length;
-    setCurrentIndex(nextIdx);
-    setIsPlaying(true);
-    if (iframeRef.current) {
-      iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[nextIdx].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
-    }
+    nextHandlerRef.current();
   };
 
   const handlePrev = () => {
     setDirection(-1);
-    const prevIdx = (currentIndex - 1 + SONGS.length) % SONGS.length;
-    setCurrentIndex(prevIdx);
+    setCurrentIndex((prev) => (prev - 1 + SONGS.length) % SONGS.length);
     setIsPlaying(true);
-    if (iframeRef.current) {
-      iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[prevIdx].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
-    }
   };
 
   const togglePlay = () => {
-    const nextPlaying = !isPlaying;
-    setIsPlaying(nextPlaying);
-    if (iframeRef.current) {
-      if (nextPlaying) {
-        iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[currentIndex].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
-      } else {
-        iframeRef.current.src = '';
+    setIsPlaying((prev) => !prev);
+  };
+
+  // Initialize YT API once on mount
+  useEffect(() => {
+    // Preload all song covers for instantaneous swiping
+    SONGS.forEach(song => {
+      const img = new Image();
+      img.src = song.cover;
+    });
+
+    const initPlayer = () => {
+      const YT = (window as any).YT;
+      if (!YT || !YT.Player || playerRef.current) return;
+
+      playerRef.current = new YT.Player('youtube-audio-player', {
+        height: '0',
+        width: '0',
+        videoId: SONGS[currentIndex].youtubeId,
+        playerVars: {
+          autoplay: isPlaying ? 1 : 0,
+          controls: 0,
+          disablekb: 1,
+          fs: 0,
+          rel: 0,
+          showinfo: 0,
+          modestbranding: 1
+        },
+        events: {
+          onReady: () => {
+            setApiReady(true);
+            if (isPlaying) {
+              playerRef.current.playVideo();
+            }
+          },
+          onStateChange: (event: any) => {
+            if (event.data === YT.PlayerState.ENDED) {
+              // Seamless continuous playback
+              nextHandlerRef.current();
+            }
+          }
+        }
+      });
+    };
+
+    const YT = (window as any).YT;
+    if (YT && YT.Player) {
+      initPlayer();
+    } else {
+      (window as any).onYouTubeIframeAPIReady = initPlayer;
+      if (!document.getElementById('youtube-iframe-api-script')) {
+        const tag = document.createElement('script');
+        tag.id = 'youtube-iframe-api-script';
+        tag.src = "https://www.youtube.com/iframe_api";
+        const firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode?.insertBefore(tag, firstScriptTag);
       }
     }
-  };
+  }, []);
+
+  // Synchronize state changes with the player
+  useEffect(() => {
+    if (!playerRef.current || typeof playerRef.current.loadVideoById !== 'function') return;
+
+    try {
+      const currentVideoId = playerRef.current.getVideoData?.()?.video_id;
+      const targetVideoId = SONGS[currentIndex].youtubeId;
+
+      if (currentVideoId !== targetVideoId) {
+        if (isPlaying) {
+          playerRef.current.loadVideoById(targetVideoId);
+        } else {
+          playerRef.current.cueVideoById(targetVideoId);
+        }
+      } else {
+        if (isPlaying) {
+          playerRef.current.playVideo();
+        } else {
+          playerRef.current.pauseVideo();
+        }
+      }
+    } catch (e) {
+      console.warn("YouTube Player Control Error:", e);
+    }
+  }, [currentIndex, isPlaying, apiReady]);
 
   // Sync state changes with the outside world
   useEffect(() => {
@@ -209,26 +283,12 @@ export default function DeckPlayer() {
   useEffect(() => {
     const handlePauseMusic = () => {
       setIsPlaying(false);
-      if (iframeRef.current) iframeRef.current.src = '';
     };
     const handlePlayMusic = () => {
       setIsPlaying(true);
-      if (iframeRef.current) {
-        iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[currentIndex].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
-      }
     };
     const handleToggleMusic = () => {
-      setIsPlaying(prev => {
-        const nextPlaying = !prev;
-        if (iframeRef.current) {
-          if (nextPlaying) {
-            iframeRef.current.src = `https://www.youtube.com/embed/${SONGS[currentIndex].youtubeId}?autoplay=1&mute=0&enablejsapi=1`;
-          } else {
-            iframeRef.current.src = '';
-          }
-        }
-        return nextPlaying;
-      });
+      setIsPlaying((prev) => !prev);
     };
 
     window.addEventListener('music:pause', handlePauseMusic);
@@ -239,7 +299,7 @@ export default function DeckPlayer() {
       window.removeEventListener('music:play', handlePlayMusic);
       window.removeEventListener('music:toggle', handleToggleMusic);
     };
-  }, [currentIndex]);
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -253,7 +313,6 @@ export default function DeckPlayer() {
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [currentIndex, isPlaying]);
-
 
   const activeSong = SONGS[currentIndex];
   const nextSong = SONGS[(currentIndex + 1) % SONGS.length];
@@ -343,17 +402,8 @@ export default function DeckPlayer() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Hidden YouTube Player Iframe to play song audio without showing video */}
-      <iframe
-        ref={iframeRef}
-        width="0"
-        height="0"
-        src={isPlaying && activeSong.youtubeId ? `https://www.youtube.com/embed/${activeSong.youtubeId}?autoplay=1&mute=0&enablejsapi=1` : ''}
-        title="Audio Player"
-        frameBorder="0"
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        className="absolute w-0 h-0 opacity-0 pointer-events-none"
-      />
+      {/* Hidden YouTube Player Target Div */}
+      <div id="youtube-audio-player" className="absolute w-0 h-0 opacity-0 pointer-events-none" />
     </div>
   );
 }
