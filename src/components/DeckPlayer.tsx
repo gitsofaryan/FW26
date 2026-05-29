@@ -260,7 +260,7 @@ export default function DeckPlayer() {
   const nextNextSong = SONGS[(currentIndex + 2) % SONGS.length];
 
   return (
-    <div className="relative w-[260px] h-[300px] sm:w-[300px] sm:h-[340px] flex items-center justify-center perspective-[1000px]">
+    <div className="relative w-[320px] h-[400px] sm:w-[400px] sm:h-[480px] flex items-center justify-center perspective-[1000px]">
       
       {/* Background Stack 2 */}
       <motion.div

@@ -4,7 +4,7 @@ import MasonryGallery from './components/MasonryGallery';
 import type { MasonryItem } from './components/MasonryGallery';
 import { Plus, Send, X, Music, Loader2, Upload, Play, Pause } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import RollingCounter from './components/RollingCounter';
+
 import PillNav from './components/PillNav';
 import { fetchGalleryItems, addGalleryItem, deleteGalleryItem } from './lib/gallery';
 
@@ -12,6 +12,8 @@ import type { PillNavItem } from './components/PillNav';
 import DeckPlayer from './components/DeckPlayer';
 import { PassCard } from './components/PassCard';
 import { Hyperspeed, hyperspeedPresets } from './components/Hyperspeed';
+import CountdownBucket from './components/CountdownBucket';
+import imageCompression from 'browser-image-compression';
 
 /* ─── Navigation Data ─── */
 const NAV_ITEMS: PillNavItem[] = [
@@ -103,26 +105,6 @@ export default function App() {
     loadGallery();
   }, []);
 
-  // Farewell Countdown Timer to June 14, 2026, 2:00 PM IST (Indian Standard Time)
-  const targetTime = new Date('2026-06-14T14:00:00+05:30').getTime();
-  const [timeLeft, setTimeLeft] = useState(() => {
-    const now = Date.now();
-    return Math.max(0, targetTime - now);
-  });
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      const now = Date.now();
-      setTimeLeft(Math.max(0, targetTime - now));
-    }, 1000);
-    return () => clearInterval(timer);
-  }, [targetTime]);
-
-  const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-  const hours = Math.floor((timeLeft / (1000 * 60 * 60)) % 24);
-  const minutes = Math.floor((timeLeft / 1000 / 60) % 60);
-  const seconds = Math.floor((timeLeft / 1000) % 60);
-
   // Function to add memory post (with Supabase integration)
   const handleAddPostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -130,15 +112,23 @@ export default function App() {
     setIsSubmitting(true);
 
     try {
+      // Compress image before upload
+      const options = {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1024,
+        useWebWorker: true
+      };
+      const compressedFile = await imageCompression(newPostFile, options);
+
       // Try Supabase insert and upload first
-      const newItem = await addGalleryItem(newEnrollmentNumber, newPostFile, newPostHeight);
+      const newItem = await addGalleryItem(newEnrollmentNumber, compressedFile, newPostHeight);
       if (newItem) {
         setGalleryItems(prev => [newItem, ...prev]);
       } else {
         // Fallback: add locally if Supabase fails (create a local object URL for preview)
         const localItem: MasonryItem = {
           id: Date.now().toString(),
-          img: URL.createObjectURL(newPostFile),
+          img: URL.createObjectURL(compressedFile),
           height: newPostHeight,
           enrollmentNumber: newEnrollmentNumber,
         };
@@ -177,117 +167,15 @@ export default function App() {
     <div className="relative min-h-screen bg-black font-sans text-white font-medium overflow-x-hidden">
 
       {/* ═══════════ TOP CENTER WIDE V-SHAPED COUNTDOWN BUCKET ═══════════ */}
-      <div
-        className="fixed top-0 left-1/2 -translate-x-1/2 z-50 pointer-events-auto select-none w-[88vw] sm:w-[460px]"
-        style={{
-          height: isMobile ? '48px' : '60px',
-          background: 'rgba(255, 255, 255, 0.25)',
-          clipPath: 'polygon(0 0, 100% 0, 92% 100%, 8% 100%)',
-          paddingBottom: '2px',
-          paddingLeft: '2px',
-          paddingRight: '2px'
-        }}
-      >
-        <div
-          className="w-full h-full bg-zinc-950/90 backdrop-blur-xl flex items-center justify-center px-2 sm:px-10"
-          style={{
-            clipPath: 'polygon(0 0, 100% 0, 92% 100%, 8% 100%)'
-          }}
-        >
-          <div
-            className="flex items-center justify-between w-full text-white font-mono leading-none text-sm sm:text-base"
-            style={{ fontFamily: '"Share Tech Mono", monospace' }}
-          >
-            {/* Days */}
-            <div className="flex items-center">
-              <RollingCounter
-                value={days}
-                places={[10, 1]}
-                fontSize={isMobile ? 20 : 26}
-                textColor="#ffffff"
-                fontWeight={700}
-                gradientFrom="#09090b"
-                gradientHeight={6}
-                gap={3}
-                borderRadius={4}
-                horizontalPadding={4}
-                digitStyle={{ fontFamily: '"Share Tech Mono", monospace' }}
-              />
-              <span className="text-white/40 font-bold text-xs uppercase pl-2 mt-1">D</span>
-            </div>
+      <CountdownBucket targetDate="2026-06-14T14:00:00+05:30" isMobile={isMobile} />
 
-            {/* Separator */}
-            <span className="text-white/30 font-black text-xl px-1.5 animate-pulse select-none">:</span>
-
-            {/* Hours */}
-            <div className="flex items-center">
-              <RollingCounter
-                value={hours}
-                places={[10, 1]}
-                fontSize={isMobile ? 20 : 26}
-                textColor="#ffffff"
-                fontWeight={700}
-                gradientFrom="#09090b"
-                gradientHeight={6}
-                gap={3}
-                borderRadius={4}
-                horizontalPadding={4}
-                digitStyle={{ fontFamily: '"Share Tech Mono", monospace' }}
-              />
-              <span className="text-white/40 font-bold text-xs uppercase pl-2 mt-1">H</span>
-            </div>
-
-            {/* Separator */}
-            <span className="text-white/30 font-black text-xl px-1.5 animate-pulse select-none">:</span>
-
-            {/* Minutes */}
-            <div className="flex items-center">
-              <RollingCounter
-                value={minutes}
-                places={[10, 1]}
-                fontSize={isMobile ? 20 : 26}
-                textColor="#ffffff"
-                fontWeight={700}
-                gradientFrom="#09090b"
-                gradientHeight={6}
-                gap={3}
-                borderRadius={4}
-                horizontalPadding={4}
-                digitStyle={{ fontFamily: '"Share Tech Mono", monospace' }}
-              />
-              <span className="text-white/40 font-bold text-xs uppercase pl-2 mt-1">M</span>
-            </div>
-
-            {/* Separator */}
-            <span className="text-white/30 font-black text-xl px-1.5 animate-pulse select-none">:</span>
-
-            {/* Seconds */}
-            <div className="flex items-center">
-              <RollingCounter
-                value={seconds}
-                places={[10, 1]}
-                fontSize={isMobile ? 20 : 26}
-                textColor="#ffffff"
-                fontWeight={700}
-                gradientFrom="#09090b"
-                gradientHeight={6}
-                gap={3}
-                borderRadius={4}
-                horizontalPadding={4}
-                digitStyle={{ fontFamily: '"Share Tech Mono", monospace' }}
-              />
-              <span className="text-white/40 font-bold text-xs uppercase pl-2 mt-1">S</span>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* ═══════════ STREAMLINED PILL NAVIGATION & MUSIC TOGGLE ═══════════ */}
       <div className="fixed bottom-4 sm:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 sm:gap-4 pointer-events-none">
         {/* Global Music Toggle Button */}
         <button
           onClick={() => setShowMusic(!showMusic)}
-          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 music-toggle-btn hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${showMusic ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'}`}
+          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-xl border border-white/40 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 music-toggle-btn hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${showMusic ? 'bg-white text-black font-black font-mono' : 'bg-zinc-950/95 text-white/80'}`}
           title="Toggle player deck"
         >
           <Music size={isMobile ? 16 : 20} className={showMusic ? "animate-pulse" : ""} />
@@ -304,13 +192,13 @@ export default function App() {
             }
           }}
           className="pointer-events-auto shadow-2xl"
-          baseColor="rgba(9, 9, 11, 0.9)"
+          baseColor="rgba(9, 9, 11, 0.98)"
         />
 
         {/* Global Play/Pause Control Button */}
         <button
           onClick={() => window.dispatchEvent(new Event('music:toggle'))}
-          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-md border border-white/20 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${isAudioPlaying ? 'bg-white/20 text-white' : 'bg-white/10 text-white/70'}`}
+          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-xl border border-white/40 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${isAudioPlaying ? 'bg-zinc-950/95 text-white/90' : 'bg-white/10 text-white/80'}`}
           title={isAudioPlaying ? "Pause Music" : "Play Music"}
         >
           {isAudioPlaying ? <Pause size={isMobile ? 16 : 20} /> : <Play size={isMobile ? 16 : 20} />}
@@ -337,18 +225,19 @@ export default function App() {
                 digitSize={1.2}
                 timeScale={1}
                 pause={isPaused}
-                scanlineIntensity={1.0}
-                glitchAmount={1.2}
-                flickerAmount={1}
-                noiseAmp={1}
-                chromaticAberration={2}
-                dither={0.1}
-                curvature={0.1}
+                scanlineIntensity={isMobile ? 0.3 : 1.0}
+                glitchAmount={isMobile ? 1.0 : 1.2}
+                flickerAmount={isMobile ? 0.5 : 1.0}
+                noiseAmp={isMobile ? 0.4 : 1.0}
+                chromaticAberration={isMobile ? 0.0 : 2.0}
+                dither={isMobile ? 0.0 : 0.1}
+                curvature={isMobile ? 0.0 : 0.1}
                 tint="#ffffff"
-                mouseReact={true}
+                mouseReact={!isMobile}
                 mouseStrength={0.5}
                 pageLoadAnimation={true}
                 brightness={1.0}
+                dpr={isMobile ? 1.0 : 1.5}
                 className="absolute inset-0 w-full h-full z-0"
               />
 
@@ -576,12 +465,12 @@ export default function App() {
       </AnimatePresence>
 
       {/* Global Music Player Content (Always mounted, toggled visually via CSS to prevent audio pause) */}
-      <div className="fixed bottom-20 sm:bottom-28 left-1/2 -translate-x-1/2 z-[100000] pointer-events-none flex justify-center">
+      <div className="fixed inset-0 top-[56px] sm:top-[72px] bottom-[72px] sm:bottom-[96px] z-[100000] pointer-events-none flex items-center justify-center">
         <div
-          className="origin-bottom transition-all duration-300 pointer-events-auto"
+          className="transition-all duration-300 pointer-events-auto"
           style={{
             opacity: showMusic ? 1 : 0,
-            transform: showMusic ? (isMobile ? 'scale(0.6)' : 'scale(0.75)') : 'scale(0.5) translateY(20px)',
+            transform: showMusic ? (isMobile ? 'scale(0.95)' : 'scale(1.0)') : 'scale(0.5) translateY(20px)',
             pointerEvents: showMusic ? 'auto' : 'none'
           }}
         >

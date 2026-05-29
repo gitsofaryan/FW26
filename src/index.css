@@ -198,11 +198,7 @@
 }
 
 @media (max-width: 640px) {
-  .crt-overlay {
-    background: linear-gradient(
-      rgba(18, 16, 16, 0) 50%, 
-      rgba(0, 0, 0, 0.15) 50%
-    );
-    background-size: 100% 6px;
+  .crt-overlay, .crt-vignette {
+    display: none !important;
   }
 }

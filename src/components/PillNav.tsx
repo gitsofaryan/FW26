@@ -245,7 +245,7 @@ export const PillNav: React.FC<PillNavProps> = ({
       style={{ 
         ...cssVars, 
         fontFamily: '"Share Tech Mono", monospace',
-        background: 'rgba(255, 255, 255, 0.25)' // Solid white bezel frame matching terminal borders
+        background: 'rgba(255, 255, 255, 0.45)' // Solid white bezel frame matching terminal borders
       }}
     >
       <div

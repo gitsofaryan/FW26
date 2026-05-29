@@ -286,4 +286,4 @@ export const MasonryGallery: React.FC<MasonryGalleryProps> = ({
   );
 };
 
-export default MasonryGallery;
+export default React.memo(MasonryGallery);

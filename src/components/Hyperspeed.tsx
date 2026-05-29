@@ -1,4 +1,4 @@
-import { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import * as THREE from 'three';
 import { cn } from '../utils';
 
@@ -83,7 +83,7 @@ const DEFAULT_OPTIONS: HyperspeedOptions = {
   }
 };
 
-export const Hyperspeed = forwardRef<HTMLDivElement, HyperspeedProps>(({ effectOptions, className }, ref) => {
+export const Hyperspeed = React.memo(forwardRef<HTMLDivElement, HyperspeedProps>(({ effectOptions, className }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -259,7 +259,7 @@ export const Hyperspeed = forwardRef<HTMLDivElement, HyperspeedProps>(({ effectO
       />
     </div>
   );
-});
+}));
 
 export default Hyperspeed;
 

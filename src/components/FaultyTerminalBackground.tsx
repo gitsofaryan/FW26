@@ -1,5 +1,5 @@
 import { Renderer, Program, Mesh, Triangle } from 'ogl';
-import { useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useRef, useMemo, useCallback } from 'react';
 
 type Vec2 = [number, number];
 
@@ -231,7 +231,7 @@ function hexToRgb(hex: string): [number, number, number] {
   return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
 }
 
-export function FaultyTerminalBackground({
+export const FaultyTerminalBackground = React.memo(function FaultyTerminalBackground({
   scale = 1,
   gridMul = [2, 1],
   digitSize = 1.5,
@@ -413,6 +413,6 @@ export function FaultyTerminalBackground({
       {...rest}
     />
   );
-}
+});
 
 export default FaultyTerminalBackground;
