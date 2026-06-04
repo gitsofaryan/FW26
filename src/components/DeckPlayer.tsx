@@ -39,17 +39,6 @@ const SONGS: Song[] = [
     youtubeId: "SYsTrlxrRss"
   },
   {
-    id: '4',
-    title: "Can't Be Broke",
-    artist: "Rick Ross feat. Yungeen Ace",
-    cover: "https://images.unsplash.com/photo-1619983081563-430f63602796?q=80&w=1000&auto=format&fit=crop",
-    duration: "00:48:00",
-    bgGradient: "#dbeafe", // Light Blue
-    headerText: "MOTION FACTORY",
-    subText: "Best Suited For Freelancers, Content Creators",
-    youtubeId: "V8XrBwviKpM"
-  },
-  {
     id: '5',
     title: "Midnight City",
     artist: "M83",
@@ -125,6 +114,72 @@ const SONGS: Song[] = [
     headerText: "THRILLER LEGEND",
     subText: "Beat it, beat it, no one wants to be defeated",
     youtubeId: "8fO8jVZ3T9g"
+  },
+  {
+    id: '12',
+    title: "Babydoll",
+    artist: "Dominic Fike",
+    cover: "https://images.unsplash.com/photo-1498038432885-c6f3f1b912ee?q=80&w=1000&auto=format&fit=crop",
+    duration: "03:39:00",
+    bgGradient: "#fef08a", // Light Yellow
+    headerText: "BABYDOLL INDIE",
+    subText: "Dominic Fike's sun-drenched indie alternative vibe",
+    youtubeId: "nb8CnIo_-_A"
+  },
+  {
+    id: '15',
+    title: "Be My Baby",
+    artist: "The Ronettes",
+    cover: "https://images.unsplash.com/photo-1487180142328-054b783fc471?q=80&w=1000&auto=format&fit=crop",
+    duration: "02:40:00",
+    bgGradient: "#fee2e2", // Light Red
+    headerText: "60S WALL OF SOUND",
+    subText: "The timeless, legendary pop standard by The Ronettes",
+    youtubeId: "4tPJPE4uOEo"
+  },
+  {
+    id: '16',
+    title: "Naal Nachna",
+    artist: "Shashwat Sachdev, Afsana Khan, Irshad Kamil, Reble",
+    cover: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?q=80&w=1000&auto=format&fit=crop",
+    duration: "03:15:00",
+    bgGradient: "#ffedd5", // Light Orange
+    headerText: "PUNJABI GLIDE",
+    subText: "Electrifying fusion beat by Shashwat Sachdev and Afsana Khan",
+    youtubeId: "P4UnrmPFPA4"
+  },
+  {
+    id: '17',
+    title: "Character Dheela",
+    artist: "Pritam, Neeraj Shridhar, Amrita Kak",
+    cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?q=80&w=1000&auto=format&fit=crop",
+    duration: "03:47:00",
+    bgGradient: "#ccfbf1", // Light Teal
+    headerText: "PARTY CLASSIC",
+    subText: "Pritam's infectious and energetic chartbuster",
+    youtubeId: "p_0zsIyYs08"
+  },
+  {
+    id: '18',
+    title: "With You",
+    artist: "AP Dhillon",
+    cover: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?q=80&w=1000&auto=format&fit=crop",
+    duration: "03:22:00",
+    bgGradient: "#dbeafe", // Light Blue
+    headerText: "PUNJABI LO-FI",
+    subText: "AP Dhillon's smooth, chart-topping romantic sensation",
+    youtubeId: "mZQH8CPQ-wo"
+  },
+  {
+    id: '20',
+    title: "Hips Don't Lie",
+    artist: "Shakira feat. Wyclef Jean",
+    cover: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?q=80&w=1000&auto=format&fit=crop",
+    duration: "03:38:00",
+    bgGradient: "#ffedd5", // Light Orange
+    headerText: "LATIN POP HYBRID",
+    subText: "Shakira and Wyclef Jean's global chart-topping classic",
+    youtubeId: "DUT5rEU6pqM"
   }
 ];
 
