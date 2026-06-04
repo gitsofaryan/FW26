@@ -268,7 +268,7 @@ export default function DeckPlayer() {
         width: '200',
         videoId: SONGS[currentIndex].youtubeId,
         playerVars: {
-          autoplay: isPlaying ? 1 : 0,
+          autoplay: 1, // Force autoplay on load
           controls: 0,
           disablekb: 1,
           fs: 0,
@@ -280,13 +280,12 @@ export default function DeckPlayer() {
           onReady: () => {
             setApiReady(true);
             try {
+              // Play unmuted directly
               playerRef.current.unMute();
               playerRef.current.setVolume(100);
+              playerRef.current.playVideo();
             } catch (e) {
               console.warn("YouTube Player unMute/setVolume onReady error:", e);
-            }
-            if (isPlaying) {
-              playerRef.current.playVideo();
             }
           },
           onStateChange: (event: any) => {
@@ -353,38 +352,6 @@ export default function DeckPlayer() {
       console.warn("YouTube Player Control Error:", e);
     }
   }, [currentIndex, isPlaying, apiReady]);
-
-  // Autoplay recovery listener: registers immediately on mount to capture the first user interaction
-  useEffect(() => {
-    const resumeAudio = () => {
-      (window as any).__hasInteracted = true;
-      try {
-        if (playerRef.current && typeof playerRef.current.getPlayerState === 'function') {
-          const state = playerRef.current.getPlayerState();
-          if (state === 5 || state === 2 || state === -1 || state === 3) {
-            playerRef.current.unMute();
-            playerRef.current.setVolume(100);
-            playerRef.current.playVideo();
-          }
-        }
-      } catch (e) {
-        console.warn("Failed to resume audio on interaction:", e);
-      }
-      cleanup();
-    };
-
-    const cleanup = () => {
-      window.removeEventListener('click', resumeAudio);
-      window.removeEventListener('keydown', resumeAudio);
-      window.removeEventListener('touchstart', resumeAudio);
-    };
-
-    window.addEventListener('click', resumeAudio);
-    window.addEventListener('keydown', resumeAudio);
-    window.addEventListener('touchstart', resumeAudio);
-
-    return cleanup;
-  }, [apiReady, isPlaying, currentIndex]);
 
   // Sync state changes with the outside world
   useEffect(() => {
@@ -517,17 +484,17 @@ export default function DeckPlayer() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Hidden YouTube Player Target Div */}
+      {/* Hidden YouTube Player Target Div - must be in viewport to allow autoplay */}
       <div 
         ref={youtubeContainerRef} 
-        className="absolute pointer-events-none" 
+        className="fixed pointer-events-none z-0" 
         style={{
-          position: 'absolute',
-          top: '-9999px',
-          left: '-9999px',
-          width: '200px',
-          height: '200px',
-          opacity: 0,
+          bottom: '1px',
+          right: '1px',
+          width: '1px',
+          height: '1px',
+          opacity: 0.01,
+          overflow: 'hidden',
         }}
       />
     </div>

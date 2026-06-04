@@ -36,7 +36,7 @@ export default function App() {
   const [presetKey, setPresetKey] = useState<keyof typeof hyperspeedPresets>('one');
   const [terminalKey] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
-  const [showMusic, setShowMusic] = useState(true);
+  const [showMusic, setShowMusic] = useState(false);
   const [galleryKey, setGalleryKey] = useState(0);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 640);
 
@@ -74,18 +74,14 @@ export default function App() {
     return () => window.removeEventListener('music:state', handleStateChange);
   }, []);
 
-  // Automatically open the music player on home screen, and close it on other tabs
+  // Reset showMusic overlay when changing tabs
   useEffect(() => {
-    if (activeTab === 'main') {
-      setShowMusic(true);
-    } else {
-      setShowMusic(false);
-    }
+    setShowMusic(false);
   }, [activeTab]);
 
-  // Click outside to close DeckPlayer
+  // Click outside to close DeckPlayer when not on the Home tab
   useEffect(() => {
-    if (!showMusic) return;
+    if (activeTab === 'main' || !showMusic) return;
 
     const handleGlobalClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -107,7 +103,9 @@ export default function App() {
       clearTimeout(timer);
       window.removeEventListener('click', handleGlobalClick);
     };
-  }, [showMusic]);
+  }, [activeTab, showMusic]);
+
+
 
   // Click outside to close Terminal Controller
   useEffect(() => {
@@ -224,10 +222,12 @@ export default function App() {
         {/* Global Music Toggle Button */}
         <button
           onClick={() => setShowMusic(!showMusic)}
-          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-xl border border-white/40 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 music-toggle-btn hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${showMusic ? 'bg-white text-black font-black font-mono' : 'bg-zinc-950/95 text-white/80'}`}
+          className={`pointer-events-auto p-2 sm:p-3 backdrop-blur-xl border border-white/40 rounded-full transition-all shadow-2xl hover:scale-105 cursor-pointer flex-shrink-0 music-toggle-btn hover:bg-white hover:text-black hover:shadow-[0_0_15px_rgba(255,255,255,0.55)] hover:border-white/50 duration-300 ${
+            (activeTab === 'main' || showMusic) ? 'bg-white text-black font-black font-mono' : 'bg-zinc-950/95 text-white/80'
+          }`}
           title="Toggle player deck"
         >
-          <Music size={isMobile ? 16 : 20} className={showMusic ? "animate-pulse" : ""} />
+          <Music size={isMobile ? 16 : 20} className={(activeTab === 'main' || showMusic) ? "animate-pulse" : ""} />
         </button>
 
         <PillNav
@@ -614,14 +614,14 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Global Music Player Content (Always mounted, toggled visually via CSS to prevent audio pause) */}
+      {/* Global Music Player Content (Always mounted to keep audio playing, but visibility controlled by activeTab/showMusic) */}
       <div className="fixed inset-0 top-[56px] sm:top-[72px] bottom-[72px] sm:bottom-[96px] z-[100000] pointer-events-none flex items-center justify-center">
         <div
-          className="transition-all duration-300 pointer-events-auto"
+          className="transition-all duration-500 pointer-events-auto"
           style={{
-            opacity: showMusic ? 1 : 0,
-            transform: showMusic ? (isMobile ? 'scale(0.95)' : 'scale(1.0)') : 'scale(0.5) translateY(20px)',
-            pointerEvents: showMusic ? 'auto' : 'none'
+            opacity: (activeTab === 'main' || showMusic) ? 1 : 0,
+            transform: (activeTab === 'main' || showMusic) ? (isMobile ? 'scale(0.95)' : 'scale(1.0)') : 'scale(0.5) translateY(20px)',
+            pointerEvents: (activeTab === 'main' || showMusic) ? 'auto' : 'none'
           }}
         >
           <div className="filter drop-shadow-2xl deck-player-container">
